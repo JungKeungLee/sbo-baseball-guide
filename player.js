@@ -160,6 +160,12 @@
   }
 
   let pendingTip = null;
+  // VR 야구 준비운동의 해당 위치로 (vr.html)
+  const VR_LINK = {
+    batter: ["타자 시작 전 준비운동 보기", "vr.html#warmup-batter"],
+    pitcher: ["어깨 / 팔 준비운동 보기", "vr.html#warmup-arms"],
+    catcher: ["무릎 / 허리 준비운동 보기", "vr.html#warmup-legs"]
+  };
 
   /* ---------------- 탭 내용 ---------------- */
   const LVBADGE = (lv) => `<span class="plv plv-${lv}">${playerLevels[lv].icon} ${playerLevels[lv].label}</span>`;
@@ -312,6 +318,7 @@
         <div class="sum-next">
           <p>다른 포지션도 볼까요?</p>
           <div class="sum-btns">${others.map((o) => `<button class="btn role-btn role-${o.color}" data-r="${o.key}">${o.icon} ${o.name} 가이드</button>`).join("")}</div>
+          <a class="rule-link" href="${VR_LINK[r.key][1]}">🥽 ${VR_LINK[r.key][0]} <span>→</span></a>
           <a class="rule-link" href="rules.html">📘 규칙이 더 궁금하면 「왜 저렇게 해?」 <span>→</span></a>
         </div>`;
       $$(".sum-btns button", el).forEach((b) => b.addEventListener("click", () => openRole(b.dataset.r, true)));

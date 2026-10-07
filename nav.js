@@ -1,6 +1,6 @@
 /* =========================================================
    공통 상단 메뉴 — 모든 페이지 맨 위에 같은 메뉴를 붙임
-   <body data-page="home|basics|pos|rule|player|quiz"> 로 현재 메뉴를 표시
+   <body data-page="home|basics|pos|rule|player|quiz|vr"> 로 현재 메뉴를 표시
    ========================================================= */
 (function () {
   "use strict";
@@ -10,7 +10,8 @@
     { key: "pos", href: "positions.html", icon: "🧢", label: "포지션" },
     { key: "rule", href: "rules.html", icon: "🤔", label: "룰" },
     { key: "player", href: "player.html", icon: "👤", label: "선수" },
-    { key: "quiz", href: "quiz.html", icon: "🏆", label: "퀴즈" }
+    { key: "quiz", href: "quiz.html", icon: "🏆", label: "퀴즈" },
+    { key: "vr", href: "vr.html", icon: "🥽", label: "VR" }
   ];
   const page = document.body.dataset.page || "";
   const nav = document.createElement("header");

@@ -10,6 +10,7 @@
   const guide = read("wony-baseball-guide-v1");
   const player = read("wony-baseball-player-v1");
   const quiz = read("wony-baseball-quiz-v1");
+  const vr = read("wony-baseball-vr-v1");
 
   const basicIds = lessons.map((l) => l.id).concat(["board", "summary"]);
   const chapterIds = (track) => guideChapters.filter((c) => c.track === track).map((c) => c.id);
@@ -28,7 +29,9 @@
     { href: "player.html", icon: "👤", title: "내가 선수라면?", sub: "타자 · 투수 · 포수 기본 가이드", meta: "포지션별 약 3분",
       p: ratio(seen, 20) }, // 타자 7탭(스윙 비교) + 투수 7탭(구종) + 포수 6
     { href: "quiz.html", icon: "🏆", title: "야구력 테스트", sub: "퀴즈로 배운 내용 확인하기", meta: "6종류",
-      p: ratio(quizDone, 6) }
+      p: ratio(quizDone, 6) },
+    { href: "vr.html", icon: "🥽", title: "VR 야구 하기 전 꼭 보기", sub: "준비운동 · 안전 체크 · 끝난 후 스트레칭", meta: "시작 전 5~10분",
+      p: ratio((vr.seen || []).length, 6) }
   ];
 
   const total = Math.round((MENUS.reduce((s, m) => s + m.p, 0) / MENUS.length) * 100);
