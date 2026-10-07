@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>선수들은 어디에 있어? · 워니의 야구 입문서</title>
+  <meta name="description" content="수비 9명의 위치와 역할을 야구장 그림으로 알아봐요.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧢</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="guide.css">
+</head>
+<body class="guide" data-page="pos" data-track="pos">
+  <main>
+    <section class="page-head">
+      <span class="ph-icon" aria-hidden="true">🧢</span>
+      <h1>선수들은 어디에 있어?</h1>
+      <p>수비 9명의 위치와 역할을 야구장 그림으로 알아봐요.</p>
+      <div id="trackProgress" class="track-progress"></div>
+    </section>
+    <nav class="chap-nav" id="chapNav" aria-label="주제 목록"></nav>
+    <section id="chapter" class="g-chapter" aria-live="polite"></section>
+  </main>
+
+  <footer class="footer">
+    <p>⚾ SBO 재밌게 보자! — 워니의 야구 입문서</p>
+    <button class="reset-btn" id="resetGuide">'다 봤어요' 표시 지우기</button>
+  </footer>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="nav.js"></script>
+  <script src="diamond.js"></script>
+  <script src="guide-data.js"></script>
+  <script src="guide-ui.js"></script>
+  <script src="guide.js"></script>
+</body>
+</html>

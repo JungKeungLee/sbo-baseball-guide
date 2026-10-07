@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  const { $, $$, h, toast, makeDiamond, countBox, renderCompare, renderScenarios, renderDetail, createQuiz } = GuideUI;
+  const { $, $$, h, toast, makeDiamond, countBox, renderCompare, cardActions, cardHref, createQuiz } = GuideUI;
 
   /* ---------------- 상태 ---------------- */
   const KEY = "wony-baseball-player-v1";
@@ -35,13 +35,10 @@
   const pctOf = (roleKey) => Math.round(((state.seen[roleKey] || []).length / TABS.length) * 100);
 
   /* ---------------- 기존 설명으로 이동 ---------------- */
-  function linkHref(target) {
-    return target.startsWith("main:") ? "index.html#" + target.slice(5) : "guide.html#card-" + target;
-  }
   function linksHtml(links) {
     if (!links || !links.length) return "";
     return `<div class="rule-links">${links.map(([label, to]) =>
-      `<a class="rule-link" href="${linkHref(to)}">📘 ${label} <span>→</span></a>`).join("")}</div>`;
+      `<a class="rule-link" href="${cardHref(to)}">📘 ${label} <span>→</span></a>`).join("")}</div>`;
   }
 
   /* ---------------- 오늘 내 포지션은? ---------------- */
@@ -175,9 +172,11 @@
             body.appendChild(h(`<div class="g-visual center">${countBox({ b: t.visual.b, s: t.visual.s })}</div>`));
           }
           if (t.compare) body.appendChild(renderCompare(t.compare));
-          if (t.detail) renderDetail(body, t.detail);
-          if (t.scenarios) renderScenarios(body, t.scenarios);
-          if (t.links) body.appendChild(h(linksHtml(t.links)));
+          // 공통 카드 하단: 야구장 그림 + [상황 보기] [자세히 알아보기]
+          const more = [];
+          if (t.detail) more.push(h(`<p class="more-text">${t.detail}</p>`));
+          if (t.links) more.push(h(linksHtml(t.links)));
+          cardActions(body, { scenarios: t.scenarios, more });
         };
         const head = $(".acc-head", item);
         const toggle = (open) => {
@@ -238,7 +237,7 @@
               <p class="fb-title">${ok ? "🎉 정답!" : "앗! 다시 생각해보자!"}</p>
               <p>${s.explain}</p>
             </div>`;
-          if (s.scenario) renderScenarios(ans, [{ label: s.title, key: s.scenario }], { button: "▶ 야구장에서 보기" });
+          if (s.scenario) cardActions(ans, { scenarios: [{ label: s.title, key: s.scenario }], playLabel: "▶ 야구장에서 보기" });
           if (i < r.situations.length - 1) {
             const nb = h(`<button class="btn btn-primary sit-next-btn">다음 상황 →</button>`);
             nb.addEventListener("click", () => { i++; draw(); });
@@ -273,7 +272,7 @@
         <div class="sum-next">
           <p>다른 포지션도 볼까요?</p>
           <div class="sum-btns">${others.map((o) => `<button class="btn role-btn role-${o.color}" data-r="${o.key}">${o.icon} ${o.name} 가이드</button>`).join("")}</div>
-          <a class="rule-link" href="guide.html">📘 규칙이 더 궁금하면 야구 생존 가이드 <span>→</span></a>
+          <a class="rule-link" href="rules.html">📘 규칙이 더 궁금하면 「왜 저렇게 해?」 <span>→</span></a>
         </div>`;
       $$(".sum-btns button", el).forEach((b) => b.addEventListener("click", () => openRole(b.dataset.r, true)));
     }

@@ -4,8 +4,9 @@
 :root {
   --navy: #1d2f5a;
   --navy-deep: #14213d;
-  --sky: #6cc4f5;
-  --sky-soft: #e9f6ff;
+  /* sky 는 따로 쓰지 않고 네이비 계열의 옅은 톤으로 통일 */
+  --sky: #7f93bd;
+  --sky-soft: #eef2f8;
   --grass: #3fae5b;
   --grass-deep: #2e8b47;
   --grass-soft: #e7f7ec;
@@ -63,7 +64,7 @@ section { scroll-margin-top: calc(var(--topbar-h) + 8px); }
 .power-fill {
   position: absolute; inset: 0 auto 0 0; width: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--sky), var(--grass));
+  background: var(--grass);
   transition: width .6s cubic-bezier(.2, .8, .2, 1);
 }
 .power-num { font-family: var(--font-cute); font-size: 16px; color: var(--grass-deep); min-width: 40px; text-align: right; display: inline-block; }
@@ -104,7 +105,7 @@ section { scroll-margin-top: calc(var(--topbar-h) + 8px); }
 .btn:disabled { opacity: .55; cursor: default; }
 .btn-sm { min-height: 42px; padding: 8px 14px; font-size: 14px; border-radius: 12px; }
 .btn-primary { background: var(--navy); color: var(--white); }
-.btn-sky { background: var(--sky); color: var(--navy-deep); }
+.btn-sky { background: var(--yellow); color: var(--navy-deep); }
 .btn-yellow { background: var(--yellow); color: var(--navy-deep); }
 .btn-green { background: var(--grass); color: var(--white); }
 .btn-ghost { background: var(--white); color: var(--muted); border: 2px solid var(--line); box-shadow: none; }

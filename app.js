@@ -9,21 +9,15 @@
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
   /* ---------------- 저장 상태 ---------------- */
+  // learned: 다 본 단계 id / step: 지금 보고 있는 단계 번호
   const STORE_KEY = "wony-baseball-v1";
-  const LEARN_IDS = lessons.map((l) => l.id).concat(["board", "summary"]);
-
-  function freshQuiz() {
-    return { mode: "all", queue: quizList.map((_, i) => i), pos: 0, picked: null, results: {}, done: false };
-  }
+  const STEP_IDS = lessons.map((l) => l.id).concat(["board", "summary"]);
   function load() {
     try {
-      const raw = localStorage.getItem(STORE_KEY);
-      if (raw) {
-        const s = JSON.parse(raw);
-        if (s && Array.isArray(s.learned) && s.quiz && Array.isArray(s.quiz.queue)) return s;
-      }
+      const s = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+      if (s && Array.isArray(s.learned)) return Object.assign({ step: 0 }, s);
     } catch (e) { /* 저장소를 못 쓰는 환경이면 그냥 새로 시작 */ }
-    return { learned: [], quiz: freshQuiz() };
+    return { learned: [], step: 0 };
   }
   function save() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* 무시 */ }
@@ -40,23 +34,11 @@
     toastTimer = setTimeout(() => t.classList.remove("show"), 1800);
   }
 
-  function progress() {
-    const learned = state.learned.filter((id) => LEARN_IDS.includes(id)).length;
-    const answered = Object.keys(state.quiz.results).length;
-    return Math.round((learned / LEARN_IDS.length) * 50 + (answered / quizList.length) * 50);
-  }
-  let lastPct = null;
   function updateProgress() {
-    const pct = progress();
-    $$(".power-num").forEach((el) => (el.textContent = pct + "%"));
-    $$(".power-fill").forEach((el) => (el.style.width = pct + "%"));
-    const msg = $(".hero-power-msg");
-    if (pct >= 100) msg.innerHTML = "🎉 <b>야구력 100%!</b> 이제 SBO 볼 준비 완료!";
-    if (lastPct !== null && pct > lastPct) {
-      $$(".power-num").forEach((el) => { el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); });
-      if (pct >= 100) toast("🏆 야구력 100%! 경기 볼 준비 완료!");
-    }
-    lastPct = pct;
+    const n = state.learned.filter((id) => STEP_IDS.includes(id)).length;
+    const pct = Math.round((n / STEP_IDS.length) * 100);
+    const el = $("#trackProgress");
+    if (el) el.innerHTML = `<span class="tp-bar"><i style="width:${pct}%"></i></span><span>${n} / ${STEP_IDS.length} 다 봤어요</span>`;
   }
 
   /* ---------------- 공통: 다이아몬드 SVG ---------------- */
@@ -125,11 +107,7 @@
   function renderLessons() {
     const wrap = $("#lessons");
     wrap.innerHTML = lessons.map((l) => `
-      <article class="card lesson" id="lesson-${l.id}" data-learn-id="${l.id}">
-        <div class="lesson-head">
-          <span class="step-chip">STEP ${l.step}</span>
-          <span class="done-badge">✅ 완료</span>
-        </div>
+      <article class="card lesson step" id="lesson-${l.id}" data-step-id="${l.id}" hidden>
         <h3><span class="lesson-emoji">${l.emoji}</span> ${l.title}</h3>
         <p class="lead">${l.lead}</p>
         ${l.points ? `<ul class="points">${l.points.map((p) => `<li>${p}</li>`).join("")}</ul>` : ""}
@@ -137,7 +115,6 @@
         ${l.items ? `<div class="items items-${l.items.length}">${l.items.map(renderItem).join("")}</div>` : ""}
         ${l.tip ? `<p class="tip">${l.tip}</p>` : ""}
         ${l.visual ? `<div class="visual" data-visual="${l.visual}"></div>` : ""}
-        <button class="btn-learn" data-learn="${l.id}">👍 이해했어!</button>
       </article>`).join("");
 
     $$("[data-visual]", wrap).forEach((el) => {
@@ -411,212 +388,74 @@
       const open = box.hidden;
       box.hidden = !open;
       btn.setAttribute("aria-expanded", String(open));
-      btn.firstChild.textContent = open ? "접기 " : "조금 더 알아보기 ";
+      btn.firstChild.textContent = open ? "접기 " : "이것까지 알면 야구 좀 아는 사람 😎 ";
       if (open) box.classList.add("opening");
     });
   }
 
-  /* ---------------- 학습 완료 버튼 ---------------- */
-  function syncLearned() {
-    $$("[data-learn-id]").forEach((card) => {
-      const done = state.learned.includes(card.dataset.learnId);
-      card.classList.toggle("is-done", done);
-      const btn = $(`[data-learn="${card.dataset.learnId}"]`, card);
-      if (btn) btn.textContent = done ? "✅ 완료! (다시 누르면 취소)" : "👍 이해했어!";
-    });
-  }
-  function initLearnButtons() {
-    document.addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-learn]");
-      if (!btn) return;
-      const id = btn.dataset.learn;
-      const i = state.learned.indexOf(id);
-      if (i >= 0) {
-        state.learned.splice(i, 1);
-      } else {
-        state.learned.push(id);
-        btn.classList.remove("pressed"); void btn.offsetWidth; btn.classList.add("pressed");
-        toast("⚾ 야구력 UP!");
-      }
-      save();
-      syncLearned();
-      updateProgress();
-    });
+  /* ---------------- 한 단계씩 보기 ----------------
+     한 화면에 카드 하나만 보여주고, [이해했어! 다음 →]으로 넘김
+  */
+  const STEP_META = lessons.map((l) => ({ id: l.id, icon: l.emoji, label: l.title }))
+    .concat([{ id: "board", icon: "📺", label: "전광판 읽기" }, { id: "summary", icon: "📌", label: "한 줄 요약" }]);
+
+  function renderStepNav() {
+    $("#stepNav").innerHTML = STEP_META.map((m, i) =>
+      `<button data-i="${i}" class="${i === state.step ? "active" : ""} ${state.learned.includes(m.id) ? "done" : ""}" aria-label="${i + 1}단계 ${m.label}">
+        <span class="cn-ic">${m.icon}</span><span class="cn-t">${i + 1}. ${m.label}</span>
+      </button>`).join("");
+    $$("#stepNav button").forEach((b) => b.addEventListener("click", () => goStep(+b.dataset.i, true)));
+    const act = $("#stepNav .active");
+    if (act) { const nav = $("#stepNav"); nav.scrollLeft = act.offsetLeft - nav.clientWidth / 2 + act.clientWidth / 2; }
   }
 
-  /* ---------------- 퀴즈 ---------------- */
-  const LETTERS = ["1", "2", "3", "4", "5", "6"];
-
-  function score() {
-    return Object.values(state.quiz.results).filter(Boolean).length;
-  }
-  function wrongList() {
-    return quizList.map((_, i) => i).filter((i) => state.quiz.results[i] === false);
-  }
-  function gradeFor(n) {
-    return grades.find((g) => n >= g.min) || grades[grades.length - 1];
-  }
-
-  function renderQuiz() {
-    const q = state.quiz;
-    const box = $("#quizBox");
-    if (q.done) return renderResult();
-
-    const qi = q.queue[q.pos];
-    const item = quizList[qi];
-    const total = q.queue.length;
-    const answered = q.picked !== null;
-    const correct = answered && q.picked === item.answer;
-
-    const dots = q.queue.map((k, i) => {
-      let c = "";
-      if (i < q.pos || (i === q.pos && answered)) c = q.results[k] ? "ok" : "no";
-      if (i === q.pos) c += " now";
-      return `<span class="dot ${c}"></span>`;
-    }).join("");
-
-    box.innerHTML = `
-      <div class="q-top">
-        <span class="q-mode">${q.mode === "retry" ? "🔁 틀린 문제 다시 풀기" : "⚾ 야구 퀴즈"}</span>
-        <span class="q-count"><b>${q.pos + 1}</b> / ${total}</span>
-      </div>
-      <div class="q-dots">${dots}</div>
-      <h3 class="q-text"><span class="q-no">Q${qi + 1}.</span> ${item.question}</h3>
-      <div class="q-options">
-        ${item.options.map((o, i) => {
-          let c = "";
-          if (answered) {
-            if (i === item.answer) c = "correct";
-            else if (i === q.picked) c = "wrong";
-            else c = "dim";
-          }
-          return `<button class="opt ${c}" data-opt="${i}" ${answered ? "disabled" : ""}>
-            <span class="opt-no">${LETTERS[i]}</span><span>${o}</span></button>`;
-        }).join("")}
-      </div>
-      ${answered ? `
-        <div class="feedback ${correct ? "good" : "bad"}">
-          <p class="fb-title">${correct ? "🎉 정답!" : "앗! 다시 생각해보자!"}</p>
-          ${correct ? "" : `<p class="fb-answer">정답은 <b>${item.options[item.answer]}</b></p>`}
-          <p class="fb-exp">${item.explanation}</p>
-        </div>
-        <button class="btn btn-primary q-next">${q.pos + 1 < total ? "다음 문제 →" : "결과 보기 🏁"}</button>` : ""}
-    `;
-
-    $$(".opt", box).forEach((b) => b.addEventListener("click", () => pick(+b.dataset.opt)));
-    const next = $(".q-next", box);
-    if (next) next.addEventListener("click", nextQuestion);
-  }
-
-  function pick(i) {
-    const q = state.quiz;
-    if (q.picked !== null) return;
-    const qi = q.queue[q.pos];
-    q.picked = i;
-    q.results[qi] = i === quizList[qi].answer;
+  function goStep(i, scroll) {
+    if (i < 0 || i >= STEP_META.length) return;
+    state.step = i;
     save();
-    renderQuiz();
-    updateProgress();
-    const next = $(".q-next");
-    if (next) next.focus({ preventScroll: true });
+    $$(".step").forEach((el) => { el.hidden = el.dataset.stepId !== STEP_META[i].id; });
+    const last = i === STEP_META.length - 1;
+    $("#stepCount").textContent = `${i + 1} / ${STEP_META.length}`;
+    $("#stepPrev").disabled = i === 0;
+    $("#stepNext").textContent = state.learned.includes(STEP_META[i].id)
+      ? (last ? "다음: 선수들은 어디에 있어? →" : "다음 →")
+      : (last ? "👍 이해했어! 다음 메뉴로 →" : "👍 이해했어! 다음 →");
+    renderStepNav();
+    history.replaceState(null, "", "#" + (i < lessons.length ? "lesson-" + STEP_META[i].id : STEP_META[i].id));
+    if (scroll) $("#stepTop").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function nextQuestion() {
-    const q = state.quiz;
-    if (q.pos + 1 < q.queue.length) {
-      q.pos++;
-      q.picked = null;
-    } else {
-      q.done = true;
+  function nextStep() {
+    const id = STEP_META[state.step].id;
+    if (!state.learned.includes(id)) {
+      state.learned.push(id);
+      save();
+      updateProgress();
+      toast("⚾ 야구력 UP!");
     }
-    save();
-    renderQuiz();
-    scrollTo("#quiz");
-  }
-
-  function renderResult() {
-    const n = score();
-    const g = gradeFor(n);
-    const wrong = wrongList();
-    const pct = Math.round((n / quizList.length) * 100);
-    $("#quizBox").innerHTML = `
-      <div class="result">
-        <p class="r-label">⚾ 워니의 야구력</p>
-        <div class="r-score"><b>${n}</b> / ${quizList.length}</div>
-        <div class="r-bar"><span style="width:${pct}%"></span></div>
-        <p class="r-grade">${g.title}</p>
-        <p class="r-msg">${g.msg}</p>
-        ${wrong.length ? `
-          <div class="r-wrong">
-            <p>틀린 문제 <b>${wrong.length}개</b></p>
-            <ul>${wrong.map((i) => `<li>Q${i + 1}. ${quizList[i].question}</li>`).join("")}</ul>
-          </div>` : `<p class="r-perfect">🎊 전부 맞혔어! 완벽해!</p>`}
-        <div class="r-btns">
-          ${wrong.length ? `<button class="btn btn-primary" id="retryWrong">🔁 틀린 문제 다시 풀기</button>` : ""}
-          <button class="btn btn-outline" id="retryAll">↺ 처음부터 다시 풀기</button>
-        </div>
-      </div>`;
-    const rw = $("#retryWrong");
-    if (rw) rw.addEventListener("click", () => {
-      state.quiz = { ...state.quiz, mode: "retry", queue: wrongList(), pos: 0, picked: null, done: false };
-      save();
-      renderQuiz();
-      scrollTo("#quiz");
-    });
-    $("#retryAll").addEventListener("click", () => {
-      state.quiz = freshQuiz();
-      save();
-      renderQuiz();
-      updateProgress();
-      scrollTo("#quiz");
-    });
-  }
-
-  /* ---------------- 스크롤 & 메뉴 ---------------- */
-  function scrollTo(sel) {
-    const el = $(sel);
-    if (!el) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  }
-  function initNav() {
-    $$("[data-scroll]").forEach((a) => a.addEventListener("click", (e) => {
-      e.preventDefault();
-      const id = a.getAttribute("href");
-      scrollTo(id);
-      history.replaceState(null, "", id);
-    }));
-
-    // 현재 보고 있는 섹션을 메뉴에 표시
-    const links = $$(".menu a");
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((en) => {
-        if (!en.isIntersecting) return;
-        links.forEach((l) => l.classList.toggle("active", l.getAttribute("href") === "#" + en.target.id));
-      });
-    }, { rootMargin: "-45% 0px -50% 0px" });
-    $$("main > section").forEach((s) => io.observe(s));
+    if (state.step === STEP_META.length - 1) location.href = "positions.html";
+    else goStep(state.step + 1, true);
   }
 
   /* ---------------- 초기화 ---------------- */
   $("#resetAll").addEventListener("click", () => {
-    if (!confirm("학습 진행률과 퀴즈 기록을 모두 지울까요?")) return;
-    state = { learned: [], quiz: freshQuiz() };
+    if (!confirm("'다 봤어요' 표시를 모두 지울까요?")) return;
+    state = { learned: [], step: 0 };
     save();
-    syncLearned();
-    renderQuiz();
-    lastPct = null;
     updateProgress();
-    scrollTo("#hero");
+    goStep(0, true);
   });
+  $("#stepPrev").addEventListener("click", () => goStep(state.step - 1, true));
+  $("#stepNext").addEventListener("click", nextStep);
 
   renderLessons();
   initBoard();
   renderSummary();
   renderGlossary();
-  initLearnButtons();
-  syncLearned();
-  renderQuiz();
-  initNav();
   updateProgress();
+
+  // basics.html#lesson-out 처럼 특정 단계로 바로 들어온 경우
+  const hash = location.hash.replace("#", "").replace(/^lesson-/, "");
+  const hi = STEP_META.findIndex((m) => m.id === hash);
+  goStep(hi >= 0 ? hi : Math.min(state.step || 0, STEP_META.length - 1), false);
 })();

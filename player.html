@@ -13,16 +13,12 @@
   <link rel="stylesheet" href="guide.css">
   <link rel="stylesheet" href="player.css">
 </head>
-<body class="player">
-  <header class="topbar p-topbar">
-    <a href="index.html" class="brand">← 기본편</a>
-    <a href="guide.html" class="p-guide-link">생존 가이드 →</a>
-  </header>
+<body class="guide player" data-page="player">
 
   <main>
-    <section class="g-hero p-hero">
-      <span class="hero-badge">선수 입장에서 알아두기</span>
-      <h1>내가 오늘 선수라면? <span class="ball-spin">🧢</span></h1>
+    <section class="page-head p-hero">
+      <span class="ph-icon" aria-hidden="true">👤</span>
+      <h1>내가 선수라면?</h1>
       <p>“타자면 뭘 해야 하지?” “투수는 공만 던지면 되나?”<br><b>경기 전에 3~5분만</b> 읽고 가요!</p>
       <div class="today" id="today"></div>
     </section>
@@ -44,6 +40,7 @@
 
   <div class="toast" id="toast" role="status"></div>
 
+  <script src="nav.js"></script>
   <script src="diamond.js"></script>
   <script src="guide-data.js"></script>
   <script src="player-data.js"></script>

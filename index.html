@@ -4,145 +4,35 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>워니의 야구 입문서 ⚾</title>
-  <meta name="description" content="야구 하나도 몰라도 괜찮아! SBO 보기 전에 5분 만에 배우는 야구 기본 규칙">
+  <meta name="description" content="야구 하나도 몰라도 괜찮아! SBO 경기 보기 전에 빠르게 훑어보는 야구 가이드">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="guide.css">
 </head>
-<body>
-  <!-- 상단 고정 바 -->
-  <header class="topbar">
-    <a href="#hero" class="brand" data-scroll>⚾ 워니의 야구 입문서</a>
-    <div class="power" aria-label="학습 진행률">
-      <span class="power-label">야구력</span>
-      <span class="power-bar"><span class="power-fill"></span></span>
-      <b class="power-num">0%</b>
-    </div>
-    <nav class="menu">
-      <a href="#learn" data-scroll>배우기</a>
-      <a href="#board" data-scroll>전광판</a>
-      <a href="#summary" data-scroll>요약</a>
-      <a href="#more" data-scroll>용어</a>
-      <a href="#quiz" data-scroll>퀴즈</a>
-      <a href="guide.html" class="menu-next">생존 가이드 →</a>
-      <a href="player.html" class="menu-next">내가 선수라면? →</a>
-    </nav>
-  </header>
-
+<body class="guide" data-page="home">
   <main>
-    <!-- Hero -->
-    <section id="hero" class="hero">
-      <div class="hero-inner">
-        <span class="hero-badge">SBO 경기 대비 특강</span>
-        <h1>워니의 야구 입문서 <span class="ball-spin">⚾</span></h1>
-        <p class="hero-sub">야구 하나도 몰라도 괜찮아!<br><b>SBO 보기 전에 이것만 알고 가자!</b></p>
-        <p class="hero-time">⏱️ 5분이면 경기 볼 준비 완료</p>
-        <div class="hero-btns">
-          <a href="#learn" class="btn btn-primary" data-scroll>📖 야구 배우기</a>
-          <a href="#quiz" class="btn btn-sky" data-scroll>✏️ 퀴즈 풀기</a>
-        </div>
-        <div class="hero-power">
-          <div class="hero-power-top">
-            <span>현재 나의 야구력</span>
-            <b class="power-num big">0%</b>
-          </div>
-          <div class="power-bar wide"><span class="power-fill"></span></div>
-          <p class="hero-power-msg">설명 카드를 읽고 <b>👍 이해했어!</b>를 누르거나 퀴즈를 풀면 올라가요</p>
-        </div>
-      </div>
-      <div class="hero-field" aria-hidden="true"></div>
+    <section class="home-hero">
+      <span class="hero-badge">SBO 경기 보기 전에</span>
+      <h1>워니의 야구 입문서 <span class="ball-spin">⚾</span></h1>
+      <p>야구 하나도 몰라도 괜찮아!<br><b>보고 싶은 것만 골라서</b> 빠르게 훑어보자.</p>
+      <div class="home-power" id="homePower"></div>
     </section>
 
-    <!-- 단계별 설명 -->
-    <section id="learn" class="section">
-      <div class="section-head">
-        <span class="kicker">LESSON</span>
-        <h2>한 단계씩 배워보자</h2>
-        <p>점수 → 베이스 → 스트라이크/볼 → 아웃 → 안타 → 홈런 → 이닝 순서!</p>
-      </div>
-      <div id="lessons" class="lessons"></div>
-    </section>
+    <section class="home-menu" id="homeMenu" aria-label="메뉴"></section>
 
-    <!-- 전광판 -->
-    <section id="board" class="section">
-      <div class="section-head">
-        <span class="kicker">PRACTICE</span>
-        <h2>실전 전광판 읽기 📺</h2>
-        <p>경기 볼 때 화면 구석에 나오는 이거! 이제 읽을 수 있어</p>
-      </div>
-      <div class="card board-card" data-learn-id="board">
-        <div id="scoreboard" class="scoreboard"></div>
-        <div class="board-switch" id="boardSwitch"></div>
-        <div class="board-explain" id="boardExplain"></div>
-        <p class="board-note">💡 실제 전광판에는 <b>B 3개 · S 2개 · O 2개</b>만 있어요.<br>마지막 하나가 채워지는 순간 바로 결과(볼넷·삼진·공수교대)가 나니까!</p>
-        <button class="btn-learn" data-learn="board">👍 이해했어!</button>
-      </div>
-    </section>
-
-    <!-- 한 줄 요약 -->
-    <section id="summary" class="section">
-      <div class="card summary-card" data-learn-id="summary">
-        <h2>이것만 기억해도<br><span class="hl">야구 볼 수 있다!</span></h2>
-        <ol class="flow" id="flow"></ol>
-        <button class="btn-learn light" data-learn="summary">👍 이해했어!</button>
-      </div>
-    </section>
-
-    <!-- 추가 용어 -->
-    <section id="more" class="section">
-      <div class="section-head">
-        <span class="kicker">BONUS</span>
-        <h2>이것까지 알면 야구 좀 아는 사람 😎</h2>
-      </div>
-      <div class="more-wrap">
-        <button class="btn btn-outline" id="moreToggle" aria-expanded="false" aria-controls="glossary">
-          조금 더 알아보기 <span class="chev">▾</span>
-        </button>
-        <div id="glossary" class="glossary" hidden></div>
-      </div>
-    </section>
-
-    <!-- 퀴즈 -->
-    <section id="quiz" class="section">
-      <div class="section-head">
-        <span class="kicker">QUIZ</span>
-        <h2>바로 풀어보는 야구 퀴즈 ✏️</h2>
-        <p>10문제! 몇 개나 맞힐 수 있을까?</p>
-      </div>
-      <div id="quizBox" class="card quiz-card" aria-live="polite"></div>
-    </section>
-
-    <!-- 다음 단계 -->
-    <section id="next" class="section">
-      <a class="card next-card" href="guide.html">
-        <span class="kicker">NEXT STEP</span>
-        <h2>기본은 끝! 이제 실전이다 🔥</h2>
-        <p>“왜 갑자기 뛰지?” “왜 베이스만 밟았는데 아웃이지?”<br>경기 보다가 궁금한 순간을 <b>야구장 애니메이션</b>으로 풀어봐요.</p>
-        <ul class="next-list">
-          <li>🧢 포지션 배치도</li><li>💨 도루 · 견제</li><li>👟 포스아웃 · 태그아웃</li>
-          <li>↩️ 태그업 · 희생플라이</li><li>🤔 낫아웃 · 인필드 플라이</li><li>📺 중계 문장 해석</li>
-        </ul>
-        <span class="btn btn-primary">야구 생존 가이드 시작하기 →</span>
-      </a>
-      <a class="card next-card player-card" href="player.html">
-        <span class="kicker">FOR PLAYERS</span>
-        <h2>내가 오늘 선수라면? 🧢</h2>
-        <p>경기에 직접 나간다면? <b>타자 · 투수 · 포수</b>가 해야 할 일을<br>3~5분 만에 정리해요.</p>
-        <span class="btn btn-sky">🏏 타자 · ⚾ 투수 · 🧤 포수 가이드 →</span>
-      </a>
-    </section>
+    <p class="home-tip">💡 처음이라면 <b>처음 보는 야구</b> 하나만 봐도 경기 보는 데 충분해요.</p>
   </main>
 
   <footer class="footer">
     <p>⚾ SBO 재밌게 보자! — 워니의 야구 입문서</p>
-    <button class="reset-btn" id="resetAll">진행 상황 처음부터</button>
   </footer>
 
-  <div class="toast" id="toast" role="status"></div>
-
+  <script src="nav.js"></script>
   <script src="data.js"></script>
-  <script src="app.js"></script>
+  <script src="guide-data.js"></script>
+  <script src="home.js"></script>
 </body>
 </html>

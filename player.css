@@ -1,15 +1,11 @@
 /* =========================================================
    내가 오늘 선수라면? — 추가 스타일 (style.css, guide.css 위에 덮어씀)
    ========================================================= */
-body.player { --topbar-h: 56px; }
-.p-topbar { grid-template-columns: 1fr auto; padding: 12px 16px; }
-@media (min-width: 640px) { .p-topbar { grid-template-columns: 1fr auto; } .p-topbar .p-guide-link { grid-column: 2; } }
-.p-guide-link { font-weight: 800; font-size: 14px; color: var(--grass-deep); text-decoration: none; }
 
-/* 역할 색상 */
-.role-batter { --rc: #f0782d; --rc-deep: #c95a14; --rc-soft: #fff1e6; }
-.role-pitcher { --rc: #3d7fc2; --rc-deep: #2a5f96; --rc-soft: #e8f3ff; }
-.role-catcher { --rc: #2e9b55; --rc-deep: #1f7a40; --rc-soft: #e6f6ea; }
+/* 역할 색상 — 사이트 기본 팔레트 안에서만 구분 (타자 네이비 · 투수 잔디 · 포수 노랑) */
+.role-batter { --rc: var(--navy); --rc-deep: var(--navy-deep); --rc-soft: var(--sky-soft); --rc-ink: var(--white); --rc-text: var(--navy); }
+.role-pitcher { --rc: var(--grass); --rc-deep: var(--grass-deep); --rc-soft: var(--grass-soft); --rc-ink: var(--white); --rc-text: var(--grass-deep); }
+.role-catcher { --rc: var(--yellow); --rc-deep: #d9a400; --rc-soft: var(--yellow-soft); --rc-ink: var(--navy); --rc-text: #8a6400; }
 
 /* ---------------- 오늘 내 포지션은? ---------------- */
 .today { background: var(--white); border-radius: 22px; box-shadow: var(--shadow); padding: 16px; margin-top: 6px; }
@@ -17,7 +13,7 @@ body.player { --topbar-h: 56px; }
 .today-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .today-btns button {
   display: grid; place-items: center; gap: 2px; min-height: 72px;
-  border: 3px solid var(--rc-soft); background: var(--rc-soft); color: var(--rc-deep);
+  border: 3px solid var(--rc-soft); background: var(--rc-soft); color: var(--rc-text);
   border-radius: 16px; font-weight: 900; font-size: 16px; transition: transform .12s, border-color .2s;
 }
 .today-btns button span { font-size: 26px; line-height: 1; }
@@ -25,9 +21,9 @@ body.player { --topbar-h: 56px; }
 .today-btns button.active { border-color: var(--rc); }
 .today-card { margin-top: 12px; padding: 16px; border-radius: 18px; background: var(--rc-soft); border: 3px solid var(--rc); text-align: center; }
 .today-card.tc-bounce { animation: bump .45s ease; }
-.tc-label { margin: 0; font-weight: 900; color: var(--rc-deep); font-size: 14px; }
+.tc-label { margin: 0; font-weight: 900; color: var(--rc-text); font-size: 14px; }
 .tc-text { font-family: var(--font-cute); font-size: 23px; line-height: 1.4; margin: 6px 0 12px; }
-.tc-text b { font-weight: 400; color: var(--rc-deep); }
+.tc-text b { font-weight: 400; color: var(--rc-text); }
 .tc-open { width: 100%; }
 
 /* ---------------- 역할 카드 ---------------- */
@@ -48,7 +44,7 @@ body.player { --topbar-h: 56px; }
   grid-row: 1 / 5; width: 64px; height: 64px; border-radius: 20px; display: grid; place-items: center;
   font-size: 34px; background: var(--rc); box-shadow: 0 4px 0 var(--rc-deep);
 }
-.rc-sub { font-size: 11px; font-weight: 900; letter-spacing: .14em; color: var(--rc-deep); }
+.rc-sub { font-size: 11px; font-weight: 900; letter-spacing: .14em; color: var(--rc-text); }
 .rc-name { font-family: var(--font-cute); font-weight: 400; font-size: 28px; line-height: 1.1; }
 .rc-one { font-size: 14px; color: var(--muted); font-weight: 700; }
 .rc-bar { display: block; height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin-top: 6px; }
@@ -62,14 +58,14 @@ body.player { --topbar-h: 56px; }
 /* ---------------- 역할 가이드 ---------------- */
 .role-guide { max-width: 760px; margin: 18px auto 0; padding: 0 16px 20px; scroll-margin-top: calc(var(--topbar-h) + 8px); }
 .rg-head {
-  position: relative; text-align: center; color: var(--white);
+  position: relative; text-align: center; color: var(--rc-ink);
   background: linear-gradient(160deg, var(--rc) 0%, var(--rc-deep) 100%);
   border-radius: 24px; padding: 22px 18px 18px; box-shadow: var(--shadow);
 }
-.rg-icon { display: inline-grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,.2); font-size: 32px; }
+.rg-icon { display: inline-grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,.25); font-size: 32px; }
 .rg-head h2 { font-family: var(--font-cute); font-weight: 400; font-size: clamp(26px, 7vw, 34px); margin: 8px 0; }
 .rg-intro { margin: 0 0 12px; font-size: 15px; line-height: 1.7; opacity: .95; }
-.rg-one { display: inline-block; margin: 0; padding: 8px 16px; border-radius: 99px; background: var(--white); color: var(--rc-deep); font-weight: 900; }
+.rg-one { display: inline-block; margin: 0; padding: 8px 16px; border-radius: 99px; background: var(--white); color: var(--rc-text); font-weight: 900; }
 
 .rg-tabs {
   position: sticky; top: var(--topbar-h); z-index: 10;
@@ -85,9 +81,9 @@ body.player { --topbar-h: 56px; }
   padding: 7px 12px 7px 7px; font-weight: 800; font-size: 13px; color: var(--muted); transition: .2s;
 }
 .rg-no { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--line); color: var(--navy); font-size: 11px; font-weight: 900; }
-.rg-tabs button.seen .rg-no { background: var(--rc-soft); color: var(--rc-deep); }
-.rg-tabs button.active { background: var(--rc); border-color: var(--rc); color: var(--white); }
-.rg-tabs button.active .rg-no { background: var(--white); color: var(--rc-deep); }
+.rg-tabs button.seen .rg-no { background: var(--rc-soft); color: var(--rc-text); }
+.rg-tabs button.active { background: var(--rc); border-color: var(--rc); color: var(--rc-ink); }
+.rg-tabs button.active .rg-no { background: var(--white); color: var(--rc-text); }
 .rg-panel { margin-top: 12px; animation: rise .3s both; }
 .rg-pager { display: grid; grid-template-columns: 1fr 1.6fr; gap: 10px; margin-top: 16px; }
 .rg-pager .btn { font-size: 15px; }
@@ -118,7 +114,7 @@ body.player { --topbar-h: 56px; }
 .acc-head .plv { grid-column: 1; justify-self: start; }
 .acc-title { grid-column: 1; font-weight: 900; font-size: 17px; line-height: 1.4; }
 .acc-head .chev { grid-column: 2; grid-row: 1 / 3; color: var(--muted); transition: transform .2s; }
-.acc-item.open .chev { transform: rotate(180deg); }
+.acc-item.open > .acc-head .chev { transform: rotate(180deg); }
 .acc-body { padding: 0 16px 16px; animation: rise .3s both; }
 .plv { font-size: 11px; font-weight: 900; padding: 2px 8px; border-radius: 99px; }
 .plv-must { background: var(--red-soft); color: #c8333a; }
@@ -137,7 +133,7 @@ body.player { --topbar-h: 56px; }
 /* 실수 */
 .mistakes { display: grid; gap: 10px; }
 .mk { position: relative; background: var(--white); border-radius: 18px; padding: 14px 14px 12px 50px; box-shadow: var(--shadow-sm); animation: rise .4s var(--d) both; }
-.mk-no { position: absolute; left: 14px; top: 14px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--rc); color: var(--white); font-weight: 900; font-size: 13px; }
+.mk-no { position: absolute; left: 14px; top: 14px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--rc); color: var(--rc-ink); font-weight: 900; font-size: 13px; }
 .mk p { display: flex; gap: 8px; margin: 0; padding: 8px 10px; border-radius: 12px; font-size: 15px; }
 .mk p span { flex: 0 0 auto; }
 .mk-bad { background: var(--red-soft); color: #8a2a2e; text-decoration: line-through; text-decoration-color: rgba(200, 51, 58, .35); }
@@ -152,7 +148,7 @@ body.player { --topbar-h: 56px; }
 .sit-field { width: 170px; }
 .sit-text { margin: 0 0 8px; font-size: 16px; padding: 10px 12px; background: #f6f9fd; border-radius: 12px; }
 .sit-q { font-weight: 900; font-size: 17px; margin: 12px 0 10px; }
-.sit-q small { display: inline-block; font-size: 12px; color: var(--rc-deep); background: var(--rc-soft); padding: 1px 8px; border-radius: 99px; margin-left: 4px; vertical-align: 2px; }
+.sit-q small { display: inline-block; font-size: 12px; color: var(--rc-text); background: var(--rc-soft); padding: 1px 8px; border-radius: 99px; margin-left: 4px; vertical-align: 2px; }
 .sit .qz-opts .opt { justify-content: flex-start; text-align: left; }
 .sit-ans .feedback { margin-top: 12px; }
 .sit-ans .feedback p { margin: 4px 0 0; }
@@ -160,7 +156,7 @@ body.player { --topbar-h: 56px; }
 
 /* 요약 */
 .sum-card {
-  background: linear-gradient(165deg, var(--rc) 0%, var(--rc-deep) 100%); color: var(--white);
+  background: linear-gradient(165deg, var(--rc) 0%, var(--rc-deep) 100%); color: var(--rc-ink);
   border-radius: 24px; padding: 24px 20px; box-shadow: var(--shadow);
 }
 .sum-label { margin: 0 0 12px; font-family: var(--font-cute); font-size: 26px; text-align: center; }
@@ -171,13 +167,13 @@ body.player { --topbar-h: 56px; }
 }
 .sum-list li::before {
   content: counter(s); flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%;
-  display: grid; place-items: center; background: var(--white); color: var(--rc-deep); font-weight: 900;
+  display: grid; place-items: center; background: var(--white); color: var(--rc-text); font-weight: 900;
 }
 .sum-remember { margin: 14px 0 0; padding: 12px; border-radius: 14px; background: var(--white); color: var(--navy); text-align: center; font-weight: 700; }
-.sum-remember b { color: var(--rc-deep); }
+.sum-remember b { color: var(--rc-text); }
 .sum-next { text-align: center; margin-top: 18px; }
 .sum-next p { margin: 0 0 8px; font-weight: 800; color: var(--muted); }
 .sum-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-.role-btn { background: var(--rc); color: var(--white); box-shadow: 0 4px 0 var(--rc-deep); }
+.role-btn { background: var(--rc); color: var(--rc-ink); box-shadow: 0 4px 0 var(--rc-deep); }
 
 .p-disclaimer { max-width: 728px; margin: 20px auto 0; padding: 0 16px; font-size: 12px; color: var(--muted); text-align: center; }

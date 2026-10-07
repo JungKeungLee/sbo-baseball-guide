@@ -126,6 +126,84 @@
     return { open: () => toggle(true), play };
   }
 
+  /* ---------------- 공통 카드 하단: 야구장 그림 + [상황 보기] [자세히 알아보기] ----------------
+     모든 설명 카드가 같은 모양을 쓰도록 하나로 모음
+     opts = { scenarios: [{label, key}], more: [Node | html문자열], playLabel }
+     - scenarios 가 있으면 시작 장면을 작은 야구장으로 먼저 보여주고, [상황 보기]를 누르면 그 자리에서 움직임
+     - more 가 있으면 [자세히 알아보기]를 눌렀을 때만 펼침
+  */
+  function cardActions(parent, opts = {}) {
+    const list = (opts.scenarios || []).filter((s) => findScenario(s.key));
+    const more = (opts.more || []).filter(Boolean);
+    let d = null, cur = 0, played = false;
+    const playLabel = opts.playLabel || "▶ 상황 보기";
+
+    if (list.length) {
+      const fig = h(`<div class="fig">
+        ${list.length > 1 ? `<div class="fig-tabs" role="tablist">${list.map((s, i) => `<button role="tab" data-i="${i}" class="${i ? "" : "active"}">${s.label}</button>`).join("")}</div>` : ""}
+        <div class="fig-field"></div>
+      </div>`);
+      parent.appendChild(fig);
+      const first = findScenario(list[0].key);
+      const view = scenarioView(first);
+      $(".fig-field", fig).classList.toggle("full", view === "full");
+      d = makeDiamond($(".fig-field", fig), { view, caption: true });
+      d.preview(first);
+      $$(".fig-tabs button", fig).forEach((b) => b.addEventListener("click", () => {
+        cur = +b.dataset.i;
+        $$(".fig-tabs button", fig).forEach((x) => x.classList.toggle("active", x === b));
+        const sc = findScenario(list[cur].key);
+        const v = scenarioView(sc);
+        d.setView(v);
+        $(".fig-field", fig).classList.toggle("full", v === "full");
+        d.play(sc);
+        played = true;
+        if (playBtn) playBtn.textContent = "↻ 다시 보기";
+      }));
+    }
+
+    let playBtn = null;
+    if (!list.length && !more.length) return { play() {} };
+    const row = h(`<div class="card-actions"></div>`);
+    if (list.length) {
+      playBtn = h(`<button class="act act-play">${playLabel}</button>`);
+      playBtn.addEventListener("click", () => {
+        d.play(findScenario(list[cur].key));
+        played = true;
+        playBtn.textContent = "↻ 다시 보기";
+      });
+      row.appendChild(playBtn);
+    }
+    let body = null;
+    if (more.length) {
+      const moreBtn = h(`<button class="act act-more" aria-expanded="false">📖 자세히 알아보기 <span class="chev">▾</span></button>`);
+      body = h(`<div class="more-body" hidden></div>`);
+      more.forEach((m) => body.appendChild(typeof m === "string" ? h(`<div>${m}</div>`) : m));
+      moreBtn.addEventListener("click", () => {
+        body.hidden = !body.hidden;
+        moreBtn.setAttribute("aria-expanded", String(!body.hidden));
+      });
+      row.appendChild(moreBtn);
+    }
+    row.classList.toggle("single", row.children.length === 1);
+    parent.appendChild(row);
+    if (body) parent.appendChild(body);
+    return { play: () => playBtn && playBtn.click(), get played() { return played; } };
+  }
+
+  /* ---------------- 다른 페이지 설명으로 가는 주소 ----------------
+     "main:lesson-out" → 처음 보는 야구(basics.html)의 해당 단계
+     그 외 카드 id → 그 카드가 들어 있는 페이지(포지션/룰)
+  */
+  const TRACK_PAGE = { pos: "positions.html", rule: "rules.html", quiz: "quiz.html" };
+  function cardHref(target) {
+    if (target.startsWith("main:")) return "basics.html#" + target.slice(5);
+    /* global guideChapters */
+    const chs = typeof guideChapters !== "undefined" ? guideChapters : [];
+    const ch = chs.find((c) => c.cards.some((x) => x.id === target));
+    return (ch ? TRACK_PAGE[ch.track] : "rules.html") + "#card-" + target;
+  }
+
   /* ---------------- 자세히 보기 ---------------- */
   function renderDetail(card, html) {
     const box = h(`<div class="more">
@@ -271,5 +349,5 @@
     return card;
   }
 
-  global.GuideUI = { $, $$, h, toast, makeDiamond, applyStatic, lights, countBox, renderCompare, findScenario, scenarioView, renderScenarios, renderDetail, createQuiz, shuffle };
+  global.GuideUI = { $, $$, h, toast, makeDiamond, applyStatic, lights, countBox, renderCompare, findScenario, scenarioView, renderScenarios, renderDetail, cardActions, cardHref, TRACK_PAGE, createQuiz, shuffle };
 })(window);

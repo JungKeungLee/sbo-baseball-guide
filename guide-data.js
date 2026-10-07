@@ -11,7 +11,7 @@ const off = (a, dx, dy) => ({ at: a, dx, dy });
 /* ---------- 난이도 ---------- */
 const guideLevels = {
   1: { label: "처음 알기", icon: "🌱", desc: "경기 보려면 꼭 알아야 해요" },
-  2: { label: "조금 더 알기", icon: "⚾", desc: "중계에 자주 나와요" },
+  2: { label: "알아두면 좋음", icon: "⚾", desc: "중계에 자주 나와요" },
   3: { label: "야구 좀 아는 사람", icon: "🔥", desc: "조금 복잡한 규칙" }
 };
 
@@ -296,25 +296,24 @@ const guideScenarios = {
 */
 const guideChapters = [
   {
-    id: "where", icon: "🧢", title: "선수들은 어디에 있을까?",
+    id: "where", track: "pos", icon: "🧢", title: "선수들은 어디에 있을까?",
     intro: "수비팀은 <b>9명</b>이 정해진 자리에 서 있어요. 동그라미를 눌러보세요!",
     cards: [{ type: "positionMap" }]
   },
   {
-    id: "roles", icon: "🧤", title: "포지션별 역할",
+    id: "roles", track: "pos", icon: "🧤", title: "포지션별 역할",
     intro: "포지션마다 하는 일이 달라요. 탭을 넘겨보고, 마지막에 위치 맞히기 게임까지!",
     cards: [
       { type: "positionTabs" },
-      { type: "quiz", set: "spot", title: "🎯 여기에 서는 선수는 누구일까?", level: 1 },
-      { type: "quiz", set: "position", title: "✏️ 포지션 퀴즈", level: 1 }
+      { type: "linkCard", id: "posQuiz", level: 1, icon: "🎯", title: "위치 맞히기 게임", text: "야구장에 불이 켜진 자리에 누가 서는지 맞혀봐요!", href: "quiz.html#spot", button: "게임 하러 가기 →" }
     ]
   },
   {
-    id: "zones", icon: "🟩", title: "내야수와 외야수",
+    id: "zones", track: "pos", icon: "🟩", title: "내야수와 외야수",
     intro: "9명을 크게 두 무리로 나눠 부르기도 해요.",
     cards: [
       {
-        type: "card", id: "infield", level: 1, q: "베이스 근처에 모여 있는 선수들은?", term: "내야수",
+        type: "card", id: "infield", level: 1, key: ["1루수 · 2루수 · 3루수 · 유격수", "베이스 주변 흙(내야)을 지켜요", "땅볼 처리 · 송구 · 병살"], q: "베이스 근처에 모여 있는 선수들은?", term: "내야수",
         short: "<b>베이스 주변에서 빠르게 공을 처리하는 선수들</b>",
         rows: [
           { label: "누구?", text: "1루수 · 2루수 · 3루수 · 유격수 <small>(투수·포수도 내야에 있지만 보통 따로 불러요)</small>" },
@@ -324,7 +323,7 @@ const guideChapters = [
         visual: { type: "diamond", view: "full", zone: "infield", highlight: ["1B", "2B", "3B", "SS"] }
       },
       {
-        type: "card", id: "outfield", level: 1, q: "뒤쪽 넓은 잔디에 있는 선수들은?", term: "외야수",
+        type: "card", id: "outfield", level: 1, key: ["좌익수 · 중견수 · 우익수", "뒤쪽 넓은 잔디(외야)를 지켜요", "뜬공 잡기 · 장타 막기 · 긴 송구"], q: "뒤쪽 넓은 잔디에 있는 선수들은?", term: "외야수",
         short: "<b>멀리 날아가는 공을 책임지는 선수들</b>",
         rows: [
           { label: "누구?", text: "좌익수 LF · 중견수 CF · 우익수 RF" },
@@ -336,11 +335,11 @@ const guideChapters = [
     ]
   },
   {
-    id: "runners", icon: "🏃", title: "주자는 왜 뛰는 걸까?",
+    id: "runners", track: "rule", icon: "🏃", title: "주자는 왜 뛰는 걸까?",
     intro: "주자의 목표는 딱 하나, <b>홈까지 가서 점수 내기!</b> 그래서 틈만 나면 한 베이스라도 더 가려고 해요.",
     cards: [
       {
-        type: "card", id: "lead", level: 1, q: "주자는 왜 베이스에서 떨어져 있어요?", term: "리드",
+        type: "card", id: "lead", level: 1, key: ["몇 걸음 앞에서 출발하면 더 빨라요", "너무 멀리 가면 견제에 아웃", "도루를 노릴 때 크게 리드해요"], q: "주자는 왜 베이스에서 떨어져 있어요?", term: "리드",
         short: "<b>조금 앞에서 출발하면 빨리 뛸 수 있지만, 너무 멀리 가면 잡힐 수 있어요.</b>",
         rows: [
           { label: "왜?", text: "다음 베이스까지 거리를 줄이려고 몇 걸음 미리 나가 있는 거예요." },
@@ -350,13 +349,13 @@ const guideChapters = [
       },
       { type: "runnerPicker", id: "picker", level: 1, title: "👆 주자 상황 만들어보기" },
       {
-        type: "card", id: "risp", level: 1, q: "중계에서 '득점권'이라고 하면?", term: "득점권",
+        type: "card", id: "risp", level: 1, key: ["2루 또는 3루에 주자", "안타 하나면 점수가 날 수 있어요", "중계에서 '찬스'라고 자주 말해요"], q: "중계에서 '득점권'이라고 하면?", term: "득점권",
         short: "주자가 <b>2루 또는 3루</b>에 있는 상황. <b>안타 하나만 나와도 점수가 날 가능성이 높아요.</b>",
         visual: { type: "diamond", view: "infield", fielders: false, bases: { hl: [2, 3] }, label: "2루·3루 = 득점권" },
         detail: "2루 주자는 보통 안타 하나면 홈까지 들어올 수 있고, 3루 주자는 안타가 아니어도 뜬공이나 땅볼로 들어올 수 있어서 '득점권'이라고 해요."
       },
       {
-        type: "card", id: "loaded", level: 1, q: "베이스가 꽉 찼어요!", term: "만루", en: "BASES LOADED",
+        type: "card", id: "loaded", level: 1, key: ["1·2·3루 모두 주자", "볼넷만 나와도 1점", "홈런이면 4점 (그랜드슬램)"], q: "베이스가 꽉 찼어요!", term: "만루", en: "BASES LOADED",
         short: "1루, 2루, 3루에 <b>모두</b> 주자가 있는 상황",
         visual: { type: "diamond", view: "infield", fielders: false, bases: { on: [1, 2, 3] }, label: "BASES LOADED" },
         detail: "만루에서는 모든 주자가 밀려나는 상황이라 볼넷만 나와도 1점, 홈런이면 4점(그랜드슬램)이에요."
@@ -364,11 +363,11 @@ const guideChapters = [
     ]
   },
   {
-    id: "steal", icon: "💨", title: "도루와 견제",
+    id: "steal", track: "rule", icon: "💨", title: "도루와 견제",
     intro: "주자가 갑자기 뛰고, 투수는 갑자기 1루로 던지고… 둘은 <b>서로 짝꿍</b>인 플레이예요.",
     cards: [
       {
-        type: "card", id: "steal", level: 1, q: "왜 주자가 갑자기 뛰어요?", term: "도루",
+        type: "card", id: "steal", level: 1, key: ["투수가 던질 때 많이 시도", "주자가 먼저 도착하면 성공", "수비 태그가 먼저면 아웃"], q: "왜 주자가 갑자기 뛰어요?", term: "도루",
         short: "<b>수비의 빈틈을 노려 주자가 스스로 다음 베이스를 빼앗는 플레이</b>",
         rows: [
           { label: "언제 가능?", text: "공이 살아 있는 동안 언제든 시도할 수 있어요. 가장 흔한 건 <b>투수가 공을 던지는 순간</b> 출발하는 것! 그리고 <b>앞 베이스가 비어 있어야</b> 해요." },
@@ -381,7 +380,7 @@ const guideChapters = [
         detail: "실제로는 포수 송구가 아무리 빨라도 주자가 출발을 잘하면 성공하는 경우가 많아요. 그래서 발 빠른 주자가 1루에 나가면 투수와 포수가 신경을 많이 써요."
       },
       {
-        type: "card", id: "stealWhen", level: 1, q: "아무 때나 도루할 수 있어요?", term: "도루 가능한 상황",
+        type: "card", id: "stealWhen", level: 1, key: ["앞 베이스가 비어 있어야 해요", "앞 주자가 그대로면 그 베이스엔 못 가요", "앞 주자도 같이 뛰면(더블스틸) 가능"], q: "아무 때나 도루할 수 있어요?", term: "도루 가능한 상황",
         short: "<b>앞 베이스에 같은 팀 주자가 그대로 있다면 그 베이스로 들어갈 수 없어요.</b>",
         compare: {
           cols: [
@@ -392,7 +391,7 @@ const guideChapters = [
         detail: "앞 주자(2루 주자)도 같이 3루로 뛰는 <b>더블스틸</b>이라면 1루 주자도 2루로 갈 수 있어요. 그래서 '다음 베이스에 주자가 있으면 무조건 도루 불가능'은 아니에요. 한 베이스에 두 주자가 같이 서 있을 수는 없고, 그럴 땐 원래 그 베이스에 있던 앞 주자가 우선이에요."
       },
       {
-        type: "card", id: "notSteal", level: 1, q: "주자가 다음 베이스로 가면 다 도루예요?", term: "이건 도루가 아님",
+        type: "card", id: "notSteal", level: 1, key: ["스스로 빈틈을 노려 가야 도루", "안타·볼넷 덕분이면 도루 아님", "폭투·포일은 따로 기록"], q: "주자가 다음 베이스로 가면 다 도루예요?", term: "이건 도루가 아님",
         short: "주자가 <b>스스로</b> 빈틈을 노려 간 것만 도루예요.",
         compare: {
           cols: [
@@ -404,7 +403,7 @@ const guideChapters = [
         detail: "폭투는 투수 공이 너무 빗나간 것, 포일은 포수가 잡을 수 있는 공을 놓친 것이에요. 주자가 이미 도루 출발을 한 상태였는지 등에 따라 기록원이 판단이 달라질 수 있어요."
       },
       {
-        type: "card", id: "pickoff", level: 1, q: "투수는 왜 타자가 아니라 1루로 던져요?", term: "견제",
+        type: "card", id: "pickoff", level: 1, key: ["주자가 너무 멀리 나오면 던져요", "돌아오기 전에 태그하면 아웃", "도루를 막는 경고장"], q: "투수는 왜 타자가 아니라 1루로 던져요?", term: "견제",
         short: "<b>\"너 너무 멀리 나왔어!\" 하고 투수가 주자를 잡으려고 던지는 공</b>",
         rows: [
           { label: "언제?", text: "주자가 <b>리드</b>를 크게 해서 베이스에서 멀리 떨어져 있을 때" },
@@ -419,7 +418,7 @@ const guideChapters = [
     ]
   },
   {
-    id: "outs", icon: "✋", title: "아웃은 왜 되는 걸까?",
+    id: "outs", track: "rule", icon: "✋", title: "아웃은 왜 되는 걸까?",
     intro: "아웃을 만드는 방법은 크게 네 가지예요. 다음 챕터부터 하나씩 자세히 봐요.",
     cards: [
       {
@@ -437,11 +436,11 @@ const guideChapters = [
     ]
   },
   {
-    id: "force", icon: "👟", title: "포스아웃과 태그아웃",
+    id: "force", track: "rule", icon: "👟", title: "포스아웃과 태그아웃",
     intro: "어떤 땐 베이스만 밟아도 아웃, 어떤 땐 사람을 꼭 만져야 아웃. 차이는 <b>'꼭 가야 하느냐'</b>예요.",
     cards: [
       {
-        type: "card", id: "forceout", level: 2, q: "왜 사람을 안 만졌는데 아웃이에요?", term: "포스아웃",
+        type: "card", id: "forceout", level: 2, key: ["뒤에서 밀려 꼭 가야 하는 주자", "공 들고 베이스를 먼저 밟으면 아웃", "사람을 안 만져도 OK"], q: "왜 사람을 안 만졌는데 아웃이에요?", term: "포스아웃",
         short: "<b>뒤에서 주자가 밀려와 반드시 다음 베이스로 가야 하면, 수비수가 베이스를 먼저 밟아도 아웃</b>",
         rows: [
           { label: "언제?", text: "타자가 공을 치면 타자는 <b>무조건 1루</b>로 가야 해요. 그 1루에 주자가 있었다면 그 주자도 <b>무조건 2루</b>로 밀려나요." },
@@ -452,7 +451,7 @@ const guideChapters = [
         detail: "포스 상황은 '뒤에서 밀려오는 주자'가 있을 때만 생겨요. 예를 들어 2루에만 주자가 있고 1루가 비어 있으면 2루 주자는 3루로 갈 의무가 없으니 포스가 아니에요. 또 뒤쪽 주자(예: 타자)가 먼저 아웃되면 앞 주자는 더 이상 밀리지 않아서 그때부턴 태그해야 아웃이에요."
       },
       {
-        type: "card", id: "tagout", level: 2, q: "왜 이번에는 사람을 직접 만져야 해요?", term: "태그아웃",
+        type: "card", id: "tagout", level: 2, key: ["안 가도 되는데 스스로 뛴 주자", "베이스만 밟으면 아웃 아님", "공 든 채 몸을 터치해야 아웃"], q: "왜 이번에는 사람을 직접 만져야 해요?", term: "태그아웃",
         short: "<b>강제로 갈 필요가 없는 주자는 공을 든 수비수가 몸을 직접 터치해야 아웃</b>",
         rows: [
           { label: "언제?", text: "도루, 견제, 협살처럼 주자가 <b>스스로 선택해서</b> 뛴 경우" },
@@ -473,7 +472,7 @@ const guideChapters = [
         detail: "헷갈릴 땐 '뒤에 나를 미는 주자(또는 타자)가 있나?'를 떠올려보세요. 있으면 포스, 없으면 태그예요."
       },
       {
-        type: "card", id: "dp", level: 1, q: "한 번에 두 명도 아웃시킬 수 있어요?", term: "병살", en: "Double Play",
+        type: "card", id: "dp", level: 1, key: ["주로 주자 1루 + 내야 땅볼", "2루에서 한 명, 1루에서 한 명", "2아웃에선 필요 없어요"], q: "한 번에 두 명도 아웃시킬 수 있어요?", term: "병살", en: "Double Play",
         short: "<b>한 번의 수비 플레이로 두 명을 잡는 것</b>",
         rows: [
           { label: "언제?", text: "주자 1루, 0아웃 또는 1아웃에서 내야 땅볼이 나왔을 때 가장 많이 나와요." },
@@ -485,7 +484,7 @@ const guideChapters = [
         detail: "2아웃에서는 아웃 하나만 잡아도 이닝이 끝나서 병살이 필요 없어요. 병살을 노리는 땅볼을 '병살타'라고 불러요."
       },
       {
-        type: "card", id: "rundown", level: 2, q: "주자가 베이스 사이에서 왔다 갔다 해요!", term: "협살", en: "런다운",
+        type: "card", id: "rundown", level: 2, key: ["베이스 사이에 갇힌 주자", "수비가 공을 주고받으며 포위", "보통 태그아웃"], q: "주자가 베이스 사이에서 왔다 갔다 해요!", term: "협살", en: "런다운",
         short: "<b>주자가 베이스 사이에서 수비에게 포위된 상황</b>",
         rows: [
           { label: "어떻게?", text: "1루 ↔ 주자 ↔ 2루. 양쪽 수비수가 공을 주고받으며 거리를 좁혀요." },
@@ -496,11 +495,11 @@ const guideChapters = [
     ]
   },
   {
-    id: "retouch", icon: "↩️", title: "뜬공이 잡히면 왜 다시 돌아갈까?",
+    id: "retouch", track: "rule", icon: "↩️", title: "뜬공이 잡히면 왜 다시 돌아갈까?",
     intro: "뜬공이 잡히면 주자들은 <b>원래 베이스</b>로 돌아가야 해요. 그리고 거기서 다시 출발할 수 있어요!",
     cards: [
       {
-        type: "card", id: "retouchBasic", level: 1, q: "뜬공이 잡히면 주자는 왜 돌아가요?", term: "귀루",
+        type: "card", id: "retouchBasic", level: 1, key: ["뜬공이 잡히면 원래 베이스로", "다시 밟아야 출발 가능", "못 돌아가면 아웃될 수 있어요"], q: "뜬공이 잡히면 주자는 왜 돌아가요?", term: "귀루",
         short: "뜬공이 잡히면 주자는 <b>원래 있던 베이스를 다시 밟아야</b> 해요.",
         rows: [
           { label: "왜?", text: "타구가 잡히면 주자들은 공을 치기 전 자리부터 다시 시작해야 하는 규칙이라서요." },
@@ -509,7 +508,7 @@ const guideChapters = [
         scenarios: [{ label: "직선타 → 귀루 실패", key: "doubledOff" }]
       },
       {
-        type: "card", id: "tagup", level: 1, q: "공이 잡혔는데 왜 주자가 뛰어요?", term: "태그업",
+        type: "card", id: "tagup", level: 1, key: ["잡히는 순간까지 베이스에 붙어 있기", "잡히는 순간 출발!", "3루 주자면 득점 가능"], q: "공이 잡혔는데 왜 주자가 뛰어요?", term: "태그업",
         short: "<b>뜬공이 잡힌 뒤 원래 베이스를 기준으로 다시 출발하는 플레이</b>",
         rows: [
           { label: "언제 가능?", text: "뜬공이 잡힐 때 주자가 <b>원래 베이스를 밟고 있다가</b> 출발. 수비수가 공을 잡는 순간부터 출발한다고 이해하면 쉬워요." },
@@ -522,7 +521,7 @@ const guideChapters = [
         detail: "정확히는 수비수가 뜬공에 <b>처음 닿은 순간</b>부터 출발할 수 있어요. 공을 완전히 잡을 때까지 기다릴 필요는 없어요(글러브에서 튕기는 중이어도 처음 닿은 순간부터 OK). 초보자는 '잡는 순간 출발'로 기억하면 충분해요."
       },
       {
-        type: "card", id: "tooEarly", level: 3, q: "너무 일찍 출발하면 어떻게 돼요?", term: "어필 플레이",
+        type: "card", id: "tooEarly", level: 3, key: ["일찍 떠나면 돌아가서 다시 밟아야 해요", "수비팀이 어필하면 아웃", "점수도 인정 안 돼요"], q: "너무 일찍 출발하면 어떻게 돼요?", term: "어필 플레이",
         short: "공이 잡히기 전에 떠났다면 <b>원래 베이스로 돌아가 다시 밟아야</b> 해요. 안 그러면 수비팀이 어필해서 아웃시킬 수 있어요.",
         rows: [
           { label: "어필이란?", text: "수비팀이 \"저 주자 일찍 떠났어요!\" 하고 공을 그 베이스로 가져가 밟거나 주자를 태그해서 심판에게 알리는 것" },
@@ -534,11 +533,11 @@ const guideChapters = [
     ]
   },
   {
-    id: "sacfly", icon: "🙇", title: "태그업과 희생플라이",
+    id: "sacfly", track: "rule", icon: "🙇", title: "태그업과 희생플라이",
     intro: "태그업을 이용해서 <b>타자는 아웃되지만 점수는 나는</b> 플레이가 있어요.",
     cards: [
       {
-        type: "card", id: "sacFly", level: 2, q: "아웃됐는데 왜 박수를 쳐요?", term: "희생플라이",
+        type: "card", id: "sacFly", level: 2, key: ["0·1아웃 + 3루 주자 + 깊은 뜬공", "타자는 아웃, 주자는 태그업 득점", "2아웃이면 이닝 끝이라 안 돼요"], q: "아웃됐는데 왜 박수를 쳐요?", term: "희생플라이",
         short: "<b>타자는 아웃되지만 팀에 점수를 만들어주는 플레이</b>",
         rows: [
           { label: "언제 가능?", text: "<b>0아웃 또는 1아웃</b>, 3루에 주자가 있을 때 외야 깊은 뜬공" },
@@ -553,11 +552,11 @@ const guideChapters = [
     ]
   },
   {
-    id: "tactics", icon: "📋", title: "경기에서 자주 나오는 작전",
+    id: "tactics", track: "rule", icon: "📋", title: "경기에서 자주 나오는 작전",
     intro: "감독이 승리를 위해 쓰는 작전과 선수 교체예요.",
     cards: [
       {
-        type: "card", id: "sacBunt", level: 2, q: "왜 세게 안 치고 툭 대요?", term: "희생번트",
+        type: "card", id: "sacBunt", level: 2, key: ["번트로 공을 살짝 굴리기", "타자는 아웃, 주자는 한 베이스 전진", "주로 무사·1아웃에 써요"], q: "왜 세게 안 치고 툭 대요?", term: "희생번트",
         short: "<b>내 아웃 하나를 감수하고 주자를 앞으로 보내는 작전</b>",
         rows: [
           { label: "언제?", text: "주자를 득점권(2루)으로 꼭 보내고 싶을 때. 보통 무사 또는 1아웃" },
@@ -569,7 +568,7 @@ const guideChapters = [
         detail: "희생번트도 희생플라이처럼 타율 계산의 타수에 들어가지 않아요. 2아웃에서는 타자가 아웃되면 이닝이 끝나버려서 희생번트 작전을 쓰지 않아요."
       },
       {
-        type: "card", id: "pitchers", level: 1, q: "왜 투수가 계속 바뀌어요?", term: "선발 / 불펜 / 마무리",
+        type: "card", id: "pitchers", level: 1, key: ["선발: 처음부터 던지는 투수", "불펜: 중간에 이어 던지는 투수", "마무리: 막판에 리드 지키기"], q: "왜 투수가 계속 바뀌어요?", term: "선발 / 불펜 / 마무리",
         short: "<b>투수도 한 명이 끝까지 던지는 게 아니라 상황에 따라 교체될 수 있어요.</b>",
         rows: [
           { label: "선발투수", text: "경기 시작부터 던지는 투수" },
@@ -593,11 +592,11 @@ const guideChapters = [
     ]
   },
   {
-    id: "words", icon: "🎙️", title: "중계에서 자주 듣는 용어",
+    id: "words", track: "rule", icon: "🎙️", title: "중계에서 자주 듣는 용어",
     intro: "해설위원이 자주 하는 말들! 처음엔 짧게, 궁금하면 [자세히 보기]를 눌러요.",
     cards: [
       {
-        type: "card", id: "hands", level: 1, q: "'좌완', '우타'가 뭐예요?", term: "좌완 / 우완 · 좌타 / 우타",
+        type: "card", id: "hands", level: 1, key: ["좌완 · 우완 = 던지는 손", "좌타 · 우타 = 서는 타석", "좌타자는 1루 쪽 타석"], q: "'좌완', '우타'가 뭐예요?", term: "좌완 / 우완 · 좌타 / 우타",
         short: "투수는 <b>던지는 손</b>, 타자는 <b>서는 타석</b>으로 불러요.",
         rows: [
           { label: "좌완 · 우완", text: "왼손으로 던지는 투수 · 오른손으로 던지는 투수" },
@@ -607,13 +606,13 @@ const guideChapters = [
         detail: "좌타자는 투수 쪽에서 보면 오른쪽, 즉 <b>1루 쪽 타석</b>에 서요. 그래서 1루까지 조금 더 가까워요. 보통 왼손 투수가 왼손 타자에게 유리하다고 알려져서, 좌타자가 나오면 좌완 투수로 바꾸는 작전이 자주 나와요."
       },
       {
-        type: "card", id: "order", level: 1, q: "매 이닝 1번 타자부터 시작해요?", term: "타순",
+        type: "card", id: "order", level: 1, key: ["1번~9번 순서대로", "9번 다음은 다시 1번", "다음 이닝은 이어서 시작"], q: "매 이닝 1번 타자부터 시작해요?", term: "타순",
         short: "<b>아니에요!</b> 1번부터 9번까지 순서대로 계속 돌고, 다음 이닝은 <b>이어서</b> 시작해요.",
         visual: { type: "lineup" },
         detail: "9번 타자 다음은 다시 1번 타자예요. 타순을 어기고 다른 선수가 치면 '타순 착오'로 아웃이 될 수 있어요."
       },
       {
-        type: "card", id: "error", level: 2, q: "1루에 나갔는데 왜 안타가 아니에요?", term: "실책", en: "에러",
+        type: "card", id: "error", level: 2, key: ["수비 실수로 살아나간 것", "1루에 나갔다고 다 안타는 아님", "실책인지는 기록원이 판단"], q: "1루에 나갔는데 왜 안타가 아니에요?", term: "실책", en: "에러",
         short: "<b>수비 실수 때문에 살아나간 것</b>",
         rows: [
           { label: "언제?", text: "수비가 평범하게 처리할 수 있는 공을 놓치거나 잘못 던져서 타자나 주자가 살았을 때" },
@@ -622,7 +621,7 @@ const guideChapters = [
         detail: "실책인지 안타인지는 기록원이 '평범한 수비로 잡을 수 있었나?'를 보고 판단해요. 그래서 중계에서 '기록원 판단은 실책입니다' 같은 말이 나와요."
       },
       {
-        type: "card", id: "hitTypes", level: 2, q: "타구 이름이 왜 이렇게 많아요?", term: "타구 종류",
+        type: "card", id: "hitTypes", level: 2, key: ["장타: 2루타 이상의 긴 안타", "내야안타: 내야 땅볼인데 1루 세이프", "적시타: 점수가 나게 한 안타"], q: "타구 이름이 왜 이렇게 많아요?", term: "타구 종류",
         short: "공이 날아가는 모양과 결과에 따라 이름이 달라요.",
         visual: { type: "hitTypes" },
         rows: [
@@ -632,7 +631,7 @@ const guideChapters = [
         ]
       },
       {
-        type: "card", id: "fullCount", level: 1, q: "'풀카운트'면 왜 다들 긴장해요?", term: "풀카운트",
+        type: "card", id: "fullCount", level: 1, key: ["3볼 2스트라이크", "볼이면 볼넷, 스트라이크면 삼진", "파울이면 그대로 계속"], q: "'풀카운트'면 왜 다들 긴장해요?", term: "풀카운트",
         short: "<b>3볼 2스트라이크.</b> 볼 하나면 볼넷, 스트라이크 하나면 삼진이 <b>될 수 있어서</b> 긴장감이 최고!",
         visual: { type: "count", b: 3, s: 2 },
         detail: "다만 풀카운트에서도 <b>파울</b>이 나면 카운트는 그대로 3볼 2스트라이크로 계속돼요. 그래서 파울이 여러 번 이어지는 끈질긴 승부가 나오기도 해요."
@@ -643,7 +642,7 @@ const guideChapters = [
         detail: "한 이닝에 타자 3명만 상대하고 아무도 출루시키지 않았을 때 써요. 투수 입장에선 깔끔한 이닝이에요."
       },
       {
-        type: "card", id: "walkoff", level: 1, q: "점수 나자마자 경기가 끝났어요!", term: "끝내기",
+        type: "card", id: "walkoff", level: 1, key: ["홈팀만 가능 (9회 말·연장 말)", "앞서는 순간 바로 경기 끝", "끝내기 안타 · 끝내기 홈런"], q: "점수 나자마자 경기가 끝났어요!", term: "끝내기",
         short: "<b>홈팀이 마지막 공격에서 이기는 점수를 내고 바로 경기를 끝내는 것</b>",
         visual: { type: "walkoff" },
         detail: "9회 말이나 연장 말에 홈팀이 앞서는 순간 경기가 바로 끝나요(원정팀은 공격 기회가 남아 있지 않으니까). 안타면 '끝내기 안타', 홈런이면 '끝내기 홈런', 볼넷이면 '끝내기 볼넷'이에요. 끝내기 안타는 이기는 점수가 들어오는 순간 끝나서 실제 점수가 1점만 인정되기도 하지만, 끝내기 홈런은 들어온 주자 모두 점수로 인정돼요."
@@ -652,11 +651,11 @@ const guideChapters = [
     ]
   },
   {
-    id: "stats", icon: "📊", title: "야구 기록 보는 법",
+    id: "stats", track: "rule", icon: "📊", title: "야구 기록 보는 법",
     intro: "중계 화면 아래에 나오는 숫자들! 복잡한 계산은 몰라도 괜찮아요.",
     cards: [
       {
-        type: "card", id: "avg", level: 1, q: "'3할 타자'가 뭐예요?", term: "타율",
+        type: "card", id: "avg", level: 1, key: ["0.300 = 3할", "10번 중 3번 꼴로 안타", "3할이면 아주 잘 치는 타자"], q: "'3할 타자'가 뭐예요?", term: "타율",
         short: "0.300 = <b>3할</b>. <b>대략 10번 타석에 서면 3번 정도 안타를 친다</b>는 뜻이에요.",
         visual: { type: "avg" },
         detail: "정확히는 안타 ÷ 타수예요. 볼넷, 몸에 맞는 공, 희생번트, 희생플라이는 '타수'에 안 들어가서 타율이 내려가지 않아요. 프로야구에서 3할이면 아주 잘 치는 타자예요."
@@ -674,7 +673,7 @@ const guideChapters = [
         detail: "병살타를 치는 사이에 들어온 점수처럼 타점이 기록되지 않는 경우도 있어요."
       },
       {
-        type: "card", id: "era", level: 1, q: "투수 이름 옆 '평균자책점'은요?", term: "평균자책점 ERA",
+        type: "card", id: "era", level: 1, key: ["낮을수록 좋은 기록", "9이닝 기준 평균 몇 점 줬나", "수비 실책으로 준 점수는 빠져요"], q: "투수 이름 옆 '평균자책점'은요?", term: "평균자책점 ERA",
         short: "투수가 점수를 얼마나 적게 줬는지 보는 기록. <b>일반적으로 낮을수록 좋아요.</b>",
         visual: { type: "era" },
         detail: "9이닝을 던졌다고 쳤을 때 평균 몇 점을 주는지 계산한 값이에요. 계산식은 (자책점 × 9) ÷ 던진 이닝. 수비 실책 때문에 준 점수는 투수 책임이 아니라서 '자책점'에서 빠져요."
@@ -687,11 +686,11 @@ const guideChapters = [
     ]
   },
   {
-    id: "records", icon: "🏆", title: "신기한 야구 기록",
+    id: "records", track: "rule", icon: "🏆", title: "신기한 야구 기록",
     intro: "중계진이 흥분하는 데는 다 이유가 있어요!",
     cards: [
       {
-        type: "card", id: "noHit", level: 2, q: "노히트 노런이 왜 대단해요?", term: "노히트 노런 vs 퍼펙트게임",
+        type: "card", id: "noHit", level: 2, key: ["노히트 노런: 안타 0", "퍼펙트게임: 출루 0", "퍼펙트게임이 더 엄격해요"], q: "노히트 노런이 왜 대단해요?", term: "노히트 노런 vs 퍼펙트게임",
         short: "노히트 노런은 <b>상대가 안타를 하나도 치지 못하게 만든 경기</b>. 퍼펙트게임은 <b>아예 아무도 1루를 못 밟은 경기</b>!",
         visual: { type: "nested" },
         compare: {
@@ -732,7 +731,7 @@ const guideChapters = [
     ]
   },
   {
-    id: "tricky", icon: "🤔", title: "이거 은근 헷갈려요",
+    id: "tricky", track: "rule", icon: "🤔", title: "이거 은근 헷갈려요",
     intro: "경기 보다가 \"엥? 왜?\" 했던 순간들 모음. 질문을 누르면 해당 설명으로 이동해요.",
     cards: [
       { type: "qindex", id: "qindex", level: 1 },
@@ -753,7 +752,7 @@ const guideChapters = [
         }
       },
       {
-        type: "card", id: "foulFly", level: 1, q: "파울 지역에서 잡아도 아웃이에요?", term: "파울 플라이 아웃",
+        type: "card", id: "foulFly", level: 1, key: ["파울 지역 뜬공도 잡으면 아웃", "땅에 닿기 전에 잡아야 해요", "잡힌 뒤 주자는 태그업 가능"], q: "파울 지역에서 잡아도 아웃이에요?", term: "파울 플라이 아웃",
         short: "<b>네! 파울 지역이라고 무조건 다시 하는 건 아니에요.</b>",
         rows: [
           { label: "규칙", text: "파울 지역으로 날아간 공도 <b>땅에 떨어지기 전에</b> 수비수가 잡으면 타자는 아웃" },
@@ -761,7 +760,7 @@ const guideChapters = [
         ]
       },
       {
-        type: "card", id: "notOut", level: 2, q: "삼진인데 왜 타자가 뛰어요?", term: "낫아웃", en: "스트라이크아웃 낫아웃",
+        type: "card", id: "notOut", level: 2, key: ["세 번째 스트라이크를 포수가 놓침", "1루가 비었거나 2아웃이면 뛸 수 있어요", "먼저 1루에 가면 세이프"], q: "삼진인데 왜 타자가 뛰어요?", term: "낫아웃", en: "스트라이크아웃 낫아웃",
         short: "<b>삼진이어도 포수가 마지막 공을 놓치면 특정 상황에서는 플레이가 계속될 수 있어요.</b>",
         rows: [
           { label: "언제 가능?", text: "세 번째 스트라이크를 포수가 <b>제대로 못 잡았을 때</b> + 아래 조건 중 하나" },
@@ -774,7 +773,7 @@ const guideChapters = [
         detail: "0아웃·1아웃에 1루에 주자가 있으면 낫아웃이 <b>안 돼요</b>(타자 그냥 아웃). 수비가 공을 일부러 떨어뜨려 병살을 만드는 걸 막기 위해서예요. 공이 땅에 먼저 닿은 뒤 포수가 잡은 것도 '제대로 못 잡은 것'이에요. 타자가 1루로 갈 생각 없이 더그아웃 쪽으로 가버리면 아웃이 돼요. 투수 기록에는 <b>탈삼진</b>이 그대로 남아요."
       },
       {
-        type: "card", id: "infieldFly", level: 3, q: "공을 잡지도 않았는데 왜 아웃이에요?", term: "인필드 플라이",
+        type: "card", id: "infieldFly", level: 3, key: ["0·1아웃 + 1·2루(또는 만루)", "내야에 평범하게 뜬 공", "심판이 선언하면 타자 아웃"], q: "공을 잡지도 않았는데 왜 아웃이에요?", term: "인필드 플라이",
         short: "<b>수비가 일부러 공을 떨어뜨려 병살을 만드는 꼼수를 막는 규칙</b>",
         rows: [
           { label: "조건 ①", text: "<b>0아웃 또는 1아웃</b>" },
@@ -787,7 +786,7 @@ const guideChapters = [
         detail: "왜 필요할까요? 주자들은 뜬공이 잡힐 것 같으면 베이스에 붙어 있어요. 이때 수비가 일부러 공을 떨어뜨리면 주자들이 갑자기 밀려서 뛰어야 하고, 수비는 포스아웃으로 두세 명을 한꺼번에 잡을 수 있어요. 이런 꼼수를 막으려고 타자를 미리 아웃시키는 거예요. 선언 뒤에도 공은 살아 있어서 주자는 위험을 감수하고 진루할 수 있어요."
       },
       {
-        type: "card", id: "balk", level: 3, q: "갑자기 '보크!' 하고 주자가 가요", term: "보크",
+        type: "card", id: "balk", level: 3, key: ["주자가 있을 때만", "던지는 척 멈추는 등 반칙 동작", "주자가 한 베이스씩 진루"], q: "갑자기 '보크!' 하고 주자가 가요", term: "보크",
         short: "<b>투수가 주자를 속이는, 허용되지 않는 동작을 하면 선언될 수 있는 반칙</b>",
         rows: [
           { label: "언제?", text: "주자가 있을 때. 예를 들어 던지는 척하다가 멈추는 동작 등" },
@@ -795,7 +794,7 @@ const guideChapters = [
         ]
       },
       {
-        type: "card", id: "walkPush", level: 1, q: "볼넷인데 주자가 왜 움직여요?", term: "밀어내기 볼넷",
+        type: "card", id: "walkPush", level: 1, key: ["밀린 주자만 한 베이스씩", "만루면 3루 주자 홈인 → 1점", "2루에만 주자면 그대로"], q: "볼넷인데 주자가 왜 움직여요?", term: "밀어내기 볼넷",
         short: "타자가 1루로 오면서 <b>뒤에서 밀린 주자만</b> 한 베이스씩 이동해요.",
         rows: [
           { label: "1루 주자", text: "타자가 1루로 → 1루 주자는 2루로 밀려남" },
@@ -805,7 +804,7 @@ const guideChapters = [
         scenarios: [{ label: "만루 밀어내기", key: "walkLoaded" }, { label: "1루 주자", key: "walkFirst" }, { label: "2루 주자만", key: "walkSecond" }]
       },
       {
-        type: "card", id: "hbp", level: 2, q: "공에 맞았는데 1루로 걸어가요", term: "몸에 맞는 공", en: "HBP · Hit By Pitch",
+        type: "card", id: "hbp", level: 2, key: ["맞으면 타자는 1루로", "밀린 주자도 같이 이동", "만루면 1점"], q: "공에 맞았는데 1루로 걸어가요", term: "몸에 맞는 공", en: "HBP · Hit By Pitch",
         short: "투수 공이 타자 몸에 맞아 인정되면 타자는 <b>1루로</b> 가요. 볼넷처럼 밀린 주자도 이동!",
         rows: [
           { label: "만루라면?", text: "주자가 모두 밀려서 3루 주자 홈인 → <b>1점</b>" }
@@ -813,13 +812,13 @@ const guideChapters = [
         detail: "스트라이크존 안으로 들어온 공에 맞았거나, 방망이를 휘두르다 맞았거나, 피하려는 노력 없이 맞으면 몸에 맞는 공으로 인정되지 않을 수 있어요."
       },
       {
-        type: "card", id: "overrun", level: 3, q: "1루는 왜 지나쳐도 돼요?", term: "1루 오버런",
+        type: "card", id: "overrun", level: 3, key: ["1루는 지나쳐도 OK", "곧장 돌아오면 아웃 아님", "2루로 가려 하면 태그 조심"], q: "1루는 왜 지나쳐도 돼요?", term: "1루 오버런",
         short: "<b>1루는 전력질주하다 조금 지나쳐도 괜찮지만, 2루·3루에서는 베이스에서 떨어져 있으면 태그를 조심해야 해요.</b>",
         scenarios: [{ label: "1루 지나치기", key: "overrun" }],
         detail: "타자가 1루로 뛰다가 베이스를 지나쳐도 <b>곧바로 1루로 돌아오면</b> 태그당해도 아웃이 아니에요. 하지만 <b>2루로 진루하려는 행동</b>을 했다면 태그아웃될 수 있어요. 흔히 '오른쪽으로 돌면 안전, 왼쪽으로 돌면 위험'이라고 말하지만, 실제 규칙은 몸을 어느 쪽으로 돌렸느냐가 아니라 <b>2루로 가려는 시도를 했느냐</b>를 심판이 판단하는 거예요."
       },
       {
-        type: "card", id: "hrTrot", level: 2, q: "홈런인데 왜 베이스를 다 돌아요?", term: "홈런 베이스 러닝",
+        type: "card", id: "hrTrot", level: 2, key: ["홈런도 베이스를 다 밟아야 해요", "1루 → 2루 → 3루 → 홈 순서", "빼먹으면 어필 아웃"], q: "홈런인데 왜 베이스를 다 돌아요?", term: "홈런 베이스 러닝",
         short: "<b>홈런이라고 점수가 순간이동해서 들어오는 건 아니에요.</b> 1루 → 2루 → 3루 → 홈 순서대로 밟아야 해요.",
         scenarios: [{ label: "베이스 한 바퀴", key: "homerunTrot" }],
         detail: "타자와 주자 모두 베이스를 순서대로 밟아야 해요. 하나라도 빼먹으면 수비팀이 어필해서 아웃시킬 수 있어요."
@@ -827,12 +826,12 @@ const guideChapters = [
     ]
   },
   {
-    id: "broadcast", icon: "📺", title: "중계 문장 해석",
+    id: "broadcast", track: "rule", icon: "📺", title: "중계 문장 해석",
     intro: "캐스터가 빠르게 말하는 한 문장에 정보가 꽉 차 있어요. 먼저 스스로 생각해보고 [해석 보기]!",
     cards: [{ type: "broadcast", id: "bc" }]
   },
   {
-    id: "situation", icon: "🧠", title: "상황 퀴즈",
+    id: "situation", track: "quiz", icon: "🧠", title: "상황 퀴즈",
     intro: "외운 걸 실제 상황에 써볼 차례! 야구장 그림을 보면서 판단해요.",
     cards: [
       { type: "quiz", set: "possible", title: "⭕ 가능할까? 불가능할까?" },
@@ -840,7 +839,7 @@ const guideChapters = [
     ]
   },
   {
-    id: "final", icon: "🏁", title: "최종 야구력 테스트",
+    id: "final", track: "quiz", icon: "🏁", title: "최종 야구력 테스트",
     intro: "모든 챕터에서 골고루 12문제! 풀 때마다 문제가 바뀌어요.",
     cards: [{ type: "quiz", set: "final", title: "🏁 최종 테스트" }]
   }

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>야구력 테스트 · 워니의 야구 입문서</title>
+  <meta name="description" content="배운 야구 규칙을 퀴즈로 확인해봐요">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="guide.css">
+</head>
+<body class="guide" data-page="quiz">
+  <main>
+    <section class="page-head">
+      <span class="ph-icon" aria-hidden="true">🏆</span>
+      <h1>야구력 테스트</h1>
+      <p>보고 싶은 퀴즈 하나만 골라서 풀어도 돼요.</p>
+    </section>
+    <section class="g-chapter">
+      <div class="quiz-menu" id="quizMenu"></div>
+      <div id="quizArea" class="quiz-area"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>⚾ SBO 재밌게 보자! — 워니의 야구 입문서</p>
+    <button class="reset-btn" id="resetQuiz">퀴즈 기록 지우기</button>
+  </footer>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="nav.js"></script>
+  <script src="diamond.js"></script>
+  <script src="data.js"></script>
+  <script src="guide-data.js"></script>
+  <script src="guide-ui.js"></script>
+  <script src="quiz.js"></script>
+</body>
+</html>

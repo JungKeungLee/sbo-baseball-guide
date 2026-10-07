@@ -4,14 +4,14 @@
    (diamond.js, guide-data.js 다음에 불러와야 합니다 — btw/off 헬퍼와 기존 시나리오를 같이 씀)
 
    links: 기존 설명으로 이동하는 버튼 [버튼 문구, 대상]
-     대상이 "main:lesson-out" 처럼 main: 으로 시작하면 기본편(index.html)의 해당 영역,
-     그 외에는 생존 가이드(guide.html)의 카드 id
+     대상이 "main:lesson-out" 처럼 main: 으로 시작하면 처음 보는 야구(basics.html)의 해당 단계,
+     그 외에는 포지션(positions.html) / 룰(rules.html) 페이지의 카드 id (GuideUI.cardHref 가 알아서 찾음)
    ========================================================= */
 
 /* ---------- 난이도 ---------- */
 const playerLevels = {
   must: { label: "꼭 알아두기", icon: "📌" },
-  good: { label: "이것까지 알면 좋음", icon: "👍" },
+  good: { label: "알아두면 좋음", icon: "👍" },
   tip: { label: "실전 팁", icon: "💡" }
 };
 

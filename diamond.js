@@ -310,22 +310,27 @@
       return dur;
     }
 
-    async play(scenario, { onDone } = {}) {
+    // 시나리오의 시작 장면만 보여줌 (카드의 '간단한 야구장 그림'으로 사용)
+    preview(scenario) {
       this.reset();
-      const run = this.runId;
       const setup = scenario.setup || {};
-      this._speed = reduceMotion() ? 0.35 : 1;
       if (setup.view) this.setView(setup.view);
       Object.keys(setup.runners || {}).forEach((id) => this.addRunner(id, setup.runners[id]));
       Object.keys(setup.fielders || {}).forEach((c) => this.fielders[c] && this.place(this.fielders[c], setup.fielders[c], false));
-      if (setup.ball !== null) {
-        this.place(this.ball, setup.ball || "P", false);
-        this.ball.classList.remove("hidden");
-      }
+      // 공은 투수 손(P)에서 시작하지만, 투수를 가리지 않도록 처음 움직일 때 나타남
+      this.place(this.ball, setup.ball || "P", false);
+      if (setup.ball) this.ball.classList.remove("hidden");
       if (setup.bases) this.setBases(setup.bases);
       if (setup.highlight) this.highlightGroup(setup.highlight);
+      if (this.caption) this.caption.innerHTML = setup.text || "";
       this._n = scenario.steps.length;
-      if (this.caption) this.caption.innerHTML = setup.text || "준비!";
+    }
+
+    async play(scenario, { onDone } = {}) {
+      this.preview(scenario);
+      const run = this.runId;
+      this._speed = reduceMotion() ? 0.35 : 1;
+      if (this.caption) this.caption.innerHTML = (scenario.setup && scenario.setup.text) || "준비!";
       await wait(700 * this._speed);
       for (let i = 0; i < scenario.steps.length; i++) {
         if (run !== this.runId) return;
