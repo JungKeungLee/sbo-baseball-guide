@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>야구 생존 가이드 ⚾ 워니의 야구 입문서</title>
+  <meta name="description" content="왜 주자가 뛰지? 왜 베이스만 밟았는데 아웃이지? 실제 경기 보면서 바로 써먹는 야구 생존 가이드">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="guide.css">
+</head>
+<body class="guide">
+  <header class="topbar g-topbar">
+    <a href="index.html" class="brand">← 기본편</a>
+    <div class="power" aria-label="생존 가이드 진행률">
+      <span class="power-label">생존력</span>
+      <span class="power-bar"><span class="power-fill g-power-fill"></span></span>
+      <b class="power-num g-power-num">0%</b>
+    </div>
+    <nav class="chap-nav" id="chapNav" aria-label="챕터 목록"></nav>
+  </header>
+
+  <main>
+    <section class="g-hero">
+      <span class="hero-badge">STEP 2 · 실전편</span>
+      <h1>야구 생존 가이드 <span class="ball-spin">⚾</span></h1>
+      <p>“왜 갑자기 뛰지?” “왜 베이스만 밟았는데 아웃이지?”<br><b>경기 보다가 궁금한 순간</b>을 하나씩 풀어봐요.</p>
+      <div class="level-filter" id="levelFilter" role="group" aria-label="난이도 선택">
+        <span class="lf-label">보여줄 단계</span>
+        <button data-lv="1">🌱 처음 알기만</button>
+        <button data-lv="2">⚾ 조금 더 알기까지</button>
+        <button data-lv="3">🔥 전부</button>
+      </div>
+      <button class="link-btn" id="startBtn">지금 챕터로 이동 ↓</button>
+      <a class="link-btn" href="player.html">🧢 내가 오늘 선수라면? →</a>
+    </section>
+
+    <section id="chapter" class="g-chapter" aria-live="polite"></section>
+  </main>
+
+  <footer class="footer">
+    <p>⚾ SBO 재밌게 보자! — 워니의 야구 입문서</p>
+    <button class="reset-btn" id="resetGuide">생존 가이드 처음부터</button>
+  </footer>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="diamond.js"></script>
+  <script src="guide-data.js"></script>
+  <script src="guide-ui.js"></script>
+  <script src="guide.js"></script>
+</body>
+</html>

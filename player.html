@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>내가 오늘 선수라면? ⚾ 워니의 야구 입문서</title>
+  <meta name="description" content="타자·투수·포수, 경기 전에 3~5분만 읽고 가자! 초보 선수를 위한 역할 가이드">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧢</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="guide.css">
+  <link rel="stylesheet" href="player.css">
+</head>
+<body class="player">
+  <header class="topbar p-topbar">
+    <a href="index.html" class="brand">← 기본편</a>
+    <a href="guide.html" class="p-guide-link">생존 가이드 →</a>
+  </header>
+
+  <main>
+    <section class="g-hero p-hero">
+      <span class="hero-badge">선수 입장에서 알아두기</span>
+      <h1>내가 오늘 선수라면? <span class="ball-spin">🧢</span></h1>
+      <p>“타자면 뭘 해야 하지?” “투수는 공만 던지면 되나?”<br><b>경기 전에 3~5분만</b> 읽고 가요!</p>
+      <div class="today" id="today"></div>
+    </section>
+
+    <section class="p-section">
+      <h2 class="p-h2">포지션을 골라주세요</h2>
+      <div class="role-cards" id="roleCards"></div>
+    </section>
+
+    <section id="roleGuide" class="role-guide" hidden aria-live="polite"></section>
+
+    <p class="p-disclaimer">※ 전문 기술 코칭이 아니라, 처음 경기에 나가는 초보자가 당황하지 않도록 기본 역할과 상황 판단을 정리한 가이드예요.</p>
+  </main>
+
+  <footer class="footer">
+    <p>⚾ SBO 재밌게 보자! — 워니의 야구 입문서</p>
+    <button class="reset-btn" id="resetPlayer">선수 가이드 처음부터</button>
+  </footer>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="diamond.js"></script>
+  <script src="guide-data.js"></script>
+  <script src="player-data.js"></script>
+  <script src="guide-ui.js"></script>
+  <script src="player.js"></script>
+</body>
+</html>
