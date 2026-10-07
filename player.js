@@ -9,7 +9,7 @@
 
   /* ---------------- 상태 ---------------- */
   const KEY = "wony-baseball-player-v1";
-  const TABS = [
+  const BASE_TABS = [
     { key: "basic", label: "기본 역할", icon: "🧢" },
     { key: "tips", label: "꼭 알아둘 것", icon: "📌" },
     { key: "mistakes", label: "자주 하는 실수", icon: "🙅" },
@@ -17,10 +17,24 @@
     { key: "quiz", label: "미니 퀴즈", icon: "✏️" },
     { key: "summary", label: "요약", icon: "🏁" }
   ];
+  // 역할별 추가 탭 (player-data.js 의 extraTabs) — 요약 바로 앞에 끼워 넣음
+  const EXTRA_TABS = { swing: { key: "swing", label: "스윙 비교", icon: "🏏" } };
+  function tabsOf(r) {
+    const t = BASE_TABS.slice();
+    (r.extraTabs || []).forEach((k) => { if (EXTRA_TABS[k]) t.splice(t.length - 1, 0, EXTRA_TABS[k]); });
+    return t;
+  }
   function load() {
     try {
       const s = JSON.parse(localStorage.getItem(KEY) || "null");
-      if (s && typeof s === "object" && s.seen) return Object.assign({ role: null, tab: {}, seen: {}, quiz: {}, sit: {} }, s);
+      if (s && typeof s === "object" && s.seen) {
+        const st = Object.assign({ role: null, tab: {}, seen: {}, quiz: {}, sit: {} }, s);
+        // 예전 기록은 탭 번호로 저장돼 있어서 탭 이름으로 바꿔줌
+        const k = (v) => (typeof v === "number" ? (BASE_TABS[v] || BASE_TABS[0]).key : v);
+        Object.keys(st.tab).forEach((r) => { st.tab[r] = k(st.tab[r]); });
+        Object.keys(st.seen).forEach((r) => { st.seen[r] = Array.from(new Set((st.seen[r] || []).map(k))); });
+        return st;
+      }
     } catch (e) { /* 무시 */ }
     return { role: null, tab: {}, seen: {}, quiz: {}, sit: {} };
   }
@@ -28,11 +42,15 @@
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* 무시 */ } };
   const roleOf = (key) => playerRoles.find((r) => r.key === key);
 
-  function markSeen(roleKey, tabIdx) {
+  function markSeen(roleKey, tabKey) {
     const s = state.seen[roleKey] || (state.seen[roleKey] = []);
-    if (!s.includes(tabIdx)) { s.push(tabIdx); save(); }
+    if (!s.includes(tabKey)) { s.push(tabKey); save(); }
   }
-  const pctOf = (roleKey) => Math.round(((state.seen[roleKey] || []).length / TABS.length) * 100);
+  const pctOf = (roleKey) => {
+    const tabs = tabsOf(roleOf(roleKey));
+    const seen = (state.seen[roleKey] || []).filter((k) => tabs.some((t) => t.key === k)).length;
+    return Math.round((seen / tabs.length) * 100);
+  };
 
   /* ---------------- 기존 설명으로 이동 ---------------- */
   function linksHtml(links) {
@@ -89,7 +107,8 @@
     const r = roleOf(state.role);
     if (!r) { root.hidden = true; return; }
     root.hidden = false;
-    const tab = state.tab[r.key] || 0;
+    const TABS = tabsOf(r);
+    const tab = Math.max(0, TABS.findIndex((t) => t.key === state.tab[r.key]));
     root.className = "role-guide role-" + r.color;
     root.innerHTML = `
       <header class="rg-head">
@@ -99,7 +118,7 @@
         <p class="rg-one">💬 ${r.one}</p>
       </header>
       <nav class="rg-tabs" role="tablist">${TABS.map((t, i) => `
-        <button role="tab" data-t="${i}" class="${i === tab ? "active" : ""}${(state.seen[r.key] || []).includes(i) ? " seen" : ""}" aria-selected="${i === tab}">
+        <button role="tab" data-t="${i}" class="${i === tab ? "active" : ""}${(state.seen[r.key] || []).includes(t.key) ? " seen" : ""}" aria-selected="${i === tab}">
           <span class="rg-no">${i + 1}</span>${t.icon} ${t.label}
         </button>`).join("")}</nav>
       <div class="rg-panel"></div>
@@ -109,7 +128,7 @@
       </nav>`;
     const panel = $(".rg-panel", root);
     PANELS[TABS[tab].key](panel, r);
-    markSeen(r.key, tab);
+    markSeen(r.key, TABS[tab].key);
     if (pctOf(r.key) === 100 && !(state.doneToast || {})[r.key]) {
       state.doneToast = Object.assign({}, state.doneToast, { [r.key]: true });
       save();
@@ -128,12 +147,16 @@
   }
 
   function goTab(i) {
+    const TABS = tabsOf(roleOf(state.role));
+    if (typeof i === "string") i = TABS.findIndex((t) => t.key === i);
     if (i < 0 || i >= TABS.length) return;
-    state.tab[state.role] = i;
+    state.tab[state.role] = TABS[i].key;
     save();
     renderGuide();
     $("#roleGuide .rg-tabs").scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  let pendingTip = null;
 
   /* ---------------- 탭 내용 ---------------- */
   const LVBADGE = (lv) => `<span class="plv plv-${lv}">${playerLevels[lv].icon} ${playerLevels[lv].label}</span>`;
@@ -187,8 +210,12 @@
         };
         head.addEventListener("click", () => toggle(body.hidden));
         acc.appendChild(item);
-        if (i === 0) toggle(true);
+        if (pendingTip ? t.id === pendingTip : i === 0) {
+          toggle(true);
+          if (pendingTip) setTimeout(() => item.scrollIntoView({ behavior: "smooth", block: "center" }), 80);
+        }
       });
+      pendingTip = null;
       $$(".tip-filter button", el).forEach((b) => b.addEventListener("click", () => {
         $$(".tip-filter button", el).forEach((x) => x.classList.toggle("active", x === b));
         $$(".acc-item", el).forEach((it) => { it.hidden = !!b.dataset.lv && it.dataset.lv !== b.dataset.lv; });
@@ -261,6 +288,11 @@
       }));
     },
 
+    swing(el) {
+      renderSwing(el);
+      pendingTip = null;
+    },
+
     summary(el, r) {
       const others = playerRoles.filter((x) => x.key !== r.key);
       el.innerHTML = `
@@ -278,6 +310,276 @@
     }
   };
 
+  /* ---------------- 타자 · 스윙 비교 ----------------
+     데이터: player-data.js 의 batterSwing
+     5단계(준비 · 시작 · 진입 · 임팩트 · 팔로스루)를 SVG 로 보여주고, 세 스윙 궤적을 겹쳐서 비교
+  */
+  const SW = batterSwing;
+  const swingOf = (k) => SW.swings.find((s) => s.key === k);
+  const stepText = (i, k) => {
+    const t = SW.steps[i].text;
+    return typeof t === "string" ? t : t[k];
+  };
+  // 점 여러 개를 부드러운 곡선(path)으로 이어줌
+  function curve(pts) {
+    if (pts.length < 2) return "";
+    let d = `M${pts[0][0]},${pts[0][1]}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += ` C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0]},${p2[1]}`;
+    }
+    return d;
+  }
+  // 궤적은 '스윙 시작'부터 그림 (준비 자세의 배트 위치는 빼고)
+  const pathOf = (sw, upto = 4) => curve(sw.frames.tip.slice(1, upto + 1));
+  const ballAt = (sw, i) => (i < 3 ? SW.ballIn[i] : i === 3 ? SW.impact : sw.ballOut);
+
+  function swingSvg(cls = "") {
+    return `<svg class="sw-svg ${cls}" viewBox="0 0 320 200" role="img" aria-label="스윙 그림">
+      <defs><marker id="swArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="sw-arrowhead"/></marker></defs>
+      <rect x="0" y="0" width="320" height="200" rx="18" class="sw-bg"/>
+      <line x1="0" y1="186" x2="320" y2="186" class="sw-ground"/>
+      <text x="306" y="22" class="sw-hint">← 공이 와요</text>
+      <g class="sw-paths"></g>
+      <g class="sw-batter">
+        <circle cx="80" cy="46" r="11" class="sw-body"/>
+        <path d="M82,58 L90,118 M90,118 L68,182 M90,118 L114,182" class="sw-limb"/>
+        <line x1="86" y1="70" x2="96" y2="72" class="sw-limb sw-arm"/>
+      </g>
+      <line x1="96" y1="72" x2="58" y2="30" class="sw-bat"/>
+      <g class="sw-impact" opacity="0">
+        <circle cx="${SW.impact[0]}" cy="${SW.impact[1]}" r="15" class="sw-burst"/>
+        <text x="${SW.impact[0]}" y="${SW.impact[1] - 22}" class="sw-pow">딱!</text>
+      </g>
+      <g class="sw-out" opacity="0"><line class="sw-outline" marker-end="url(#swArrow)"/><text class="sw-outtext"></text></g>
+      <circle r="6" cx="300" cy="118" class="sw-ball"/>
+    </svg>`;
+  }
+
+  function SwingViewer(host) {
+    host.innerHTML = `
+      <div class="sw-modes" role="tablist">
+        ${SW.swings.map((s) => `<button data-m="${s.key}" class="sw-${s.key}"><i></i>${s.name} 보기</button>`).join("")}
+        <button data-m="compare" class="sw-cmp">🔀 비교해서 보기</button>
+      </div>
+      <div class="sw-stage">${swingSvg()}</div>
+      <div class="sw-legend" hidden>${SW.swings.map((s) => `<span class="sw-${s.key}"><i></i>${s.name}</span>`).join("")}</div>
+      <div class="sw-steps">${SW.steps.map((st, i) => `<button data-s="${i}"><b>${i + 1}</b>${st.name}</button>`).join("")}</div>
+      <p class="sw-desc" aria-live="polite"></p>
+      <div class="sw-ctrl">
+        <button class="btn btn-ghost sw-prev">← 이전</button>
+        <button class="btn btn-primary sw-play">▶ 재생</button>
+        <button class="btn btn-ghost sw-next">다음 →</button>
+      </div>`;
+    const svg = $("svg", host);
+    const q = (s) => $(s, svg);
+    const bat = q(".sw-bat"), arm = q(".sw-arm"), ball = q(".sw-ball");
+    const paths = q(".sw-paths"), impact = q(".sw-impact"), outG = q(".sw-out");
+    let mode = "down", step = 0, pose = null, raf = 0, fb = 0, timer = 0, run = 0;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const setPose = (p) => {
+      bat.setAttribute("x1", p.hands[0]); bat.setAttribute("y1", p.hands[1]);
+      bat.setAttribute("x2", p.tip[0]); bat.setAttribute("y2", p.tip[1]);
+      arm.setAttribute("x2", p.hands[0]); arm.setAttribute("y2", p.hands[1]);
+      ball.setAttribute("cx", p.ball[0]); ball.setAttribute("cy", p.ball[1]);
+      pose = p;
+    };
+    const target = (sw, i) => ({ hands: sw.frames.hands[i], tip: sw.frames.tip[i], ball: ballAt(sw, i) });
+    const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+
+    function drawSingle(i, animate) {
+      const sw = swingOf(mode);
+      cancelAnimationFrame(raf);
+      clearTimeout(fb);
+      const to = target(sw, i);
+      const trail = q(".sw-trail");
+      const done = () => {
+        setPose(to);
+        trail.setAttribute("d", pathOf(sw, i));
+        impact.setAttribute("opacity", i >= 3 ? "1" : "0");
+        outG.setAttribute("opacity", i === 4 ? "1" : "0");
+      };
+      if (!animate || !pose || reduce) { done(); return; }
+      const from = pose, t0 = performance.now(), ms = 420;
+      const tick = (now) => {
+        const t = Math.min(1, (now - t0) / ms), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        const p = { hands: lerp(from.hands, to.hands, e), tip: lerp(from.tip, to.tip, e), ball: lerp(from.ball, to.ball, e) };
+        setPose(p);
+        trail.setAttribute("d", curve(sw.frames.tip.slice(1, i).concat([p.tip]).filter((_, k, a) => i > 0 || k === a.length - 1)));
+        if (t < 1) raf = requestAnimationFrame(tick); else { clearTimeout(fb); done(); }
+      };
+      raf = requestAnimationFrame(tick);
+      // 탭이 백그라운드라 프레임이 안 돌아도 마지막 자세는 꼭 맞춰 둠
+      fb = setTimeout(() => { cancelAnimationFrame(raf); done(); }, ms + 120);
+    }
+
+    function setMode(m) {
+      mode = m;
+      run++;
+      clearTimeout(timer);
+      cancelAnimationFrame(raf);
+      $$(".sw-modes button", host).forEach((b) => b.classList.toggle("active", b.dataset.m === m));
+      const cmp = m === "compare";
+      svg.classList.toggle("compare", cmp);
+      $(".sw-legend", host).hidden = !cmp;
+      $(".sw-steps", host).hidden = cmp;
+      $(".sw-prev", host).hidden = cmp;
+      $(".sw-next", host).hidden = cmp;
+      paths.innerHTML = "";
+      if (cmp) {
+        // 세 궤적을 한 화면에 겹쳐서
+        SW.swings.forEach((s, k) => {
+          paths.insertAdjacentHTML("beforeend",
+            `<path d="${pathOf(s)}" class="sw-line sw-${s.key}" style="--d:${k * 0.5}s"/>
+             <line x1="${SW.impact[0]}" y1="${SW.impact[1]}" x2="${s.ballOut[0]}" y2="${s.ballOut[1]}" class="sw-line thin sw-${s.key}" style="--d:${k * 0.5 + 0.3}s" marker-end="url(#swArrow)"/>`);
+        });
+        setPose({ hands: [148, 126], tip: [204, 124], ball: SW.impact });
+        bat.classList.add("ghost"); arm.classList.add("ghost");
+        impact.setAttribute("opacity", "1");
+        outG.setAttribute("opacity", "0");
+        $(".sw-desc", host).innerHTML = "세 스윙 모두 <b>같은 공(임팩트)</b>을 지나지만, <b>들어오는 길과 빠져나가는 방향</b>이 조금씩 달라요. 어느 하나가 정답은 아니에요!";
+        replayCompare();
+      } else {
+        const sw = swingOf(m);
+        bat.classList.remove("ghost"); arm.classList.remove("ghost");
+        paths.innerHTML = `<path d="${pathOf(sw)}" class="sw-ghost sw-${m}"/><path class="sw-trail sw-line sw-${m}" d=""/>`;
+        const ol = q(".sw-outline");
+        ol.setAttribute("x1", SW.impact[0]); ol.setAttribute("y1", SW.impact[1]);
+        ol.setAttribute("x2", sw.ballOut[0]); ol.setAttribute("y2", sw.ballOut[1]);
+        ol.setAttribute("class", "sw-outline sw-" + m);
+        const ot = q(".sw-outtext");
+        ot.setAttribute("x", Math.min(sw.ballOut[0], 300)); ot.setAttribute("y", sw.ballOut[1] + (sw.ballOut[1] < 100 ? -8 : 18));
+        ot.textContent = sw.result;
+        pose = null;
+        goStep(0, false);
+        play();
+      }
+    }
+
+    function replayCompare() {
+      $$(".sw-line", paths).forEach((p) => { p.classList.remove("draw"); void p.getBoundingClientRect(); p.classList.add("draw"); });
+    }
+
+    function goStep(i, animate = true) {
+      step = Math.max(0, Math.min(4, i));
+      $$(".sw-steps button", host).forEach((b) => b.classList.toggle("active", +b.dataset.s === step));
+      const sw = swingOf(mode);
+      $(".sw-desc", host).innerHTML = `<b class="sw-stepname sw-${mode}">${step + 1}. ${SW.steps[step].name}</b> ${stepText(step, mode)}`;
+      $(".sw-prev", host).disabled = step === 0;
+      $(".sw-next", host).disabled = step === 4;
+      drawSingle(step, animate);
+      return sw;
+    }
+
+    function play() {
+      if (mode === "compare") { replayCompare(); return; }
+      const my = ++run;
+      clearTimeout(timer);
+      goStep(0, false);
+      let i = 0;
+      const next = () => {
+        if (my !== run || i >= 4) return;
+        i++;
+        goStep(i, true);
+        timer = setTimeout(next, reduce ? 500 : 950);
+      };
+      timer = setTimeout(next, 600);
+    }
+
+    $$(".sw-modes button", host).forEach((b) => b.addEventListener("click", () => setMode(b.dataset.m)));
+    $$(".sw-steps button", host).forEach((b) => b.addEventListener("click", () => { run++; clearTimeout(timer); goStep(+b.dataset.s); }));
+    $(".sw-prev", host).addEventListener("click", () => { run++; clearTimeout(timer); goStep(step - 1); });
+    $(".sw-next", host).addEventListener("click", () => { run++; clearTimeout(timer); goStep(step + 1); });
+    $(".sw-play", host).addEventListener("click", play);
+    setMode("down");
+  }
+
+  function renderSwing(el) {
+    el.innerHTML = `
+      <section class="sw-intro">
+        <div class="sw-badges"><span class="plv plv-good">👍 알아두면 좋음</span><span class="plv plv-tip">🌤 실전 전에 가볍게 보기</span></div>
+        <h3 class="sw-title">${SW.title}</h3>
+        <p>${SW.intro}</p>
+        <p class="rg-one">💬 ${SW.one}</p>
+      </section>
+
+      <section class="sw-block">
+        <h4 class="sw-h">🎬 단계별로 보기</h4>
+        <div class="sw-viewer"></div>
+      </section>
+
+      <section class="sw-block">
+        <h4 class="sw-h">🃏 세 가지 스윙 카드 <small>옆으로 넘겨보세요</small></h4>
+        <div class="sw-cards"></div>
+      </section>
+
+      <section class="sw-block">
+        <h4 class="sw-h">📋 한눈에 비교</h4>
+        <div class="sw-table" role="table">
+          <div class="sw-tr sw-th" role="row"><span role="columnheader">스윙</span><span role="columnheader">쉬운 느낌</span><span role="columnheader">초보자 이미지</span></div>
+          ${SW.swings.map((s) => `<div class="sw-tr" role="row"><span role="cell" class="sw-name sw-${s.key}"><i></i>${s.name}</span><span role="cell">${s.feel}</span><span role="cell">${s.image}</span></div>`).join("")}
+        </div>
+        <p class="sw-note">💡 좋고 나쁨을 나누는 표가 아니에요. 배트가 지나가는 길의 <b>차이</b>만 보면 돼요.</p>
+      </section>
+
+      <section class="sw-block">
+        <h4 class="sw-h">🤔 초보자가 자주 헷갈리는 점</h4>
+        <div class="mistakes">${SW.myths.map((m, i) => `
+          <div class="mk" style="--d:${i * 70}ms">
+            <span class="mk-no">${i + 1}</span>
+            <p class="mk-bad"><span>❌</span>${m.bad}</p>
+            <p class="mk-good"><span>✅</span>${m.good}</p>
+          </div>`).join("")}</div>
+      </section>
+
+      <section class="sw-block sw-quiz"></section>
+
+      <p class="sw-notice">※ ${SW.notice}</p>
+
+      <div class="rule-links sw-links">
+        <button class="rule-link" data-go="basic">🏏 타자 기본 가이드 보기 <span>→</span></button>
+        <button class="rule-link" data-go="tips:b-run">🏃 공을 치면 왜 바로 뛰어야 하나? <span>→</span></button>
+        <button class="rule-link" data-go="quiz">✏️ 타자 미니퀴즈 보기 <span>→</span></button>
+      </div>`;
+
+    SwingViewer($(".sw-viewer", el));
+
+    const cards = $(".sw-cards", el);
+    SW.swings.forEach((s) => {
+      const card = h(`<article class="sw-card sw-${s.key}">
+        <p class="sw-cname"><i></i>${s.name}</p>
+        <p class="sw-cone">${s.one}</p>
+        <svg class="sw-mini" viewBox="40 20 280 160" aria-hidden="true">
+          <line x1="40" y1="186" x2="320" y2="186" class="sw-ground"/>
+          <path d="${pathOf(s)}" class="sw-line sw-${s.key}"/>
+          <line x1="${SW.impact[0]}" y1="${SW.impact[1]}" x2="${s.ballOut[0]}" y2="${s.ballOut[1]}" class="sw-line thin sw-${s.key}" marker-end="url(#swArrow)"/>
+          <circle cx="${SW.impact[0]}" cy="${SW.impact[1]}" r="6" class="sw-ball"/>
+        </svg>
+        <p class="sw-feel">느낌: <b>${s.feel}</b></p>
+        <ul class="key">${s.points.map((p) => `<li>${p}</li>`).join("")}</ul>
+      </article>`);
+      cardActions(card, { more: [h(`<p class="more-text">⚠️ ${s.caution}</p>`)] });
+      cards.appendChild(card);
+    });
+
+    const indices = playerQuizzes.map((q, i) => (q.role === "swing" ? i : -1)).filter((i) => i >= 0);
+    $(".sw-quiz", el).appendChild(createQuiz({
+      id: "pquiz-swing", title: "✏️ 스윙 미니퀴즈", level: 2,
+      questions: playerQuizzes, indices, resultLabel: "스윙 감 잡기",
+      load: () => state.quiz.swing,
+      put: (v) => { state.quiz.swing = v; save(); }
+    }));
+
+    $$(".sw-links [data-go]", el).forEach((b) => b.addEventListener("click", () => {
+      const [tab, tip] = b.dataset.go.split(":");
+      pendingTip = tip || null;
+      goTab(tab);
+    }));
+  }
+
   /* ---------------- 시작 ---------------- */
   $("#resetPlayer").addEventListener("click", () => {
     if (!confirm("선수 가이드 진행 상황과 퀴즈 기록을 모두 지울까요?")) return;
@@ -290,7 +592,11 @@
 
   renderToday();
   renderRoleCards();
-  const hm = location.hash.match(/^#(batter|pitcher|catcher)$/);
-  if (hm) openRole(hm[1], true);
+  const hm = location.hash.match(/^#(batter|pitcher|catcher)(?:-(\w+))?$/);
+  if (hm) {
+    state.role = hm[1];
+    if (hm[2]) state.tab[hm[1]] = hm[2];
+    openRole(hm[1], true);
+  }
   else renderGuide();
 })();

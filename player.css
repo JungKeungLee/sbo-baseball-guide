@@ -177,3 +177,100 @@
 .role-btn { background: var(--rc); color: var(--rc-ink); box-shadow: 0 4px 0 var(--rc-deep); }
 
 .p-disclaimer { max-width: 728px; margin: 20px auto 0; padding: 0 16px; font-size: 12px; color: var(--muted); text-align: center; }
+
+/* =========================================================
+   타자 · 스윙 비교
+   스윙 구분 색: 다운 = 네이비(실선) · 업 = 잔디(긴 점선) · 레벨 = 노랑(짧은 점선)
+   ========================================================= */
+.sw-down { --sw: var(--navy); --sw-dash: none; }
+.sw-up { --sw: var(--grass); --sw-dash: 9 6; }
+.sw-level { --sw: #e0a800; --sw-dash: 2 6; }
+
+.sw-intro { background: var(--white); border-radius: 22px; box-shadow: var(--shadow-sm); padding: 18px 16px; text-align: center; }
+.sw-badges { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.sw-title { font-family: var(--font-cute); font-weight: 400; font-size: 24px; margin: 10px 0 6px; }
+.sw-intro p { margin: 0 0 10px; font-size: 15px; }
+.sw-intro .rg-one { background: var(--sky-soft); color: var(--navy); margin: 0; }
+.sw-block { margin-top: 16px; }
+.sw-h { font-size: 17px; margin: 0 0 8px; }
+.sw-h small { font-size: 12px; color: var(--muted); font-weight: 700; margin-left: 4px; }
+
+/* 보기 선택 */
+.sw-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.sw-modes button {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  border: 2px solid var(--line); background: var(--white); border-radius: 12px;
+  padding: 8px 4px; font-size: 13px; font-weight: 800; color: var(--muted);
+}
+.sw-modes button i, .sw-legend i, .sw-name i, .sw-cname i { display: inline-block; width: 16px; height: 0; border-top: 3px solid var(--sw); }
+.sw-up i { border-top-style: dashed !important; }
+.sw-level i { border-top-style: dotted !important; border-top-width: 4px !important; }
+.sw-modes button.active { border-color: var(--sw, var(--navy)); color: var(--navy); background: var(--sky-soft); }
+.sw-modes .sw-cmp { grid-column: 1 / -1; }
+.sw-modes .sw-cmp.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+
+/* 그림 */
+.sw-stage { margin-top: 10px; }
+.sw-svg { display: block; width: 100%; height: auto; }
+.sw-bg { fill: var(--sky-soft); }
+.sw-ground { stroke: var(--grass); stroke-width: 4; }
+.sw-hint { font-size: 10px; font-weight: 800; fill: var(--muted); text-anchor: end; }
+.sw-body { fill: #c9d3e6; }
+.sw-limb { stroke: #c9d3e6; stroke-width: 9; stroke-linecap: round; fill: none; }
+.sw-bat { stroke: var(--dirt-deep); stroke-width: 7; stroke-linecap: round; }
+.sw-bat.ghost, .sw-arm.ghost { opacity: .35; }
+.sw-ball { fill: var(--white); stroke: #e2553a; stroke-width: 1.6; }
+.sw-burst { fill: var(--yellow); opacity: .55; }
+.sw-pow { font-family: var(--font-cute); font-size: 15px; fill: var(--navy); text-anchor: middle; }
+.sw-impact { transition: opacity .25s; }
+.sw-out { transition: opacity .3s; }
+.sw-outline { stroke: var(--sw); stroke-width: 2.5; stroke-dasharray: 4 4; }
+.sw-outtext { font-size: 11px; font-weight: 800; fill: var(--navy); text-anchor: end; }
+.sw-arrowhead { fill: var(--muted); }
+.sw-ghost { fill: none; stroke: var(--sw); stroke-width: 2; stroke-dasharray: 3 5; opacity: .3; }
+.sw-line { fill: none; stroke: var(--sw); stroke-width: 4; stroke-linecap: round; stroke-dasharray: var(--sw-dash); }
+.sw-line.thin { stroke-width: 2; opacity: .8; }
+.sw-svg.compare .sw-line.draw { animation: swfade .6s var(--d) both; }
+@keyframes swfade { from { opacity: 0; } }
+.sw-legend { display: flex; justify-content: center; gap: 14px; margin-top: 8px; font-size: 13px; font-weight: 800; }
+.sw-legend span { display: flex; align-items: center; gap: 5px; }
+.sw-legend[hidden] { display: none; }
+
+/* 단계 */
+.sw-steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 10px; }
+.sw-steps[hidden] { display: none; }
+.sw-steps button {
+  display: grid; justify-items: center; gap: 1px; padding: 6px 2px;
+  border: 2px solid var(--line); background: var(--white); border-radius: 10px;
+  font-size: 11px; font-weight: 800; color: var(--muted); line-height: 1.25; word-break: keep-all;
+}
+.sw-steps button b { font-size: 13px; }
+.sw-steps button.active { background: var(--navy); border-color: var(--navy); color: var(--white); }
+.sw-desc { margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; background: var(--white); box-shadow: var(--shadow-sm); font-size: 15px; min-height: 3.2em; }
+.sw-stepname { display: block; color: var(--navy); margin-bottom: 2px; }
+.sw-ctrl { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 6px; margin-top: 10px; }
+.sw-ctrl .btn { min-height: 44px; font-size: 14px; padding: 8px; }
+.sw-ctrl .btn[hidden] { display: none; }
+.sw-ctrl:has(.sw-prev[hidden]) { grid-template-columns: 1fr; }
+
+/* 카드 (모바일: 옆으로 넘기기) */
+.sw-cards { display: grid; grid-auto-flow: column; grid-auto-columns: 84%; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 2px 8px; scrollbar-width: thin; }
+@media (min-width: 700px) { .sw-cards { grid-auto-flow: row; grid-template-columns: repeat(3, 1fr); grid-auto-columns: auto; overflow: visible; } }
+.sw-card { scroll-snap-align: start; background: var(--white); border-radius: 20px; box-shadow: var(--shadow-sm); padding: 16px 14px; border-top: 5px solid var(--sw); }
+.sw-cname { display: flex; align-items: center; gap: 6px; margin: 0; font-family: var(--font-cute); font-size: 22px; }
+.sw-cone { margin: 4px 0 6px; font-size: 15px; }
+.sw-mini { display: block; width: 100%; height: auto; background: var(--sky-soft); border-radius: 14px; }
+.sw-feel { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
+.sw-feel b { color: var(--navy); }
+.sw-card .key li { font-size: 14px; }
+
+/* 한눈에 비교 */
+.sw-table { background: var(--white); border-radius: 18px; box-shadow: var(--shadow-sm); overflow: hidden; }
+.sw-tr { display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; gap: 8px; padding: 10px 12px; font-size: 14px; border-top: 1px solid var(--line); align-items: center; }
+.sw-th { border-top: 0; background: var(--navy); color: var(--white); font-weight: 800; font-size: 13px; }
+.sw-name { display: flex; align-items: center; gap: 6px; font-weight: 900; }
+.sw-note { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+
+.sw-notice { margin: 16px 0 0; padding: 10px 12px; border-radius: 12px; background: var(--white); border: 2px dashed var(--line); font-size: 13px; color: var(--muted); }
+.sw-links { margin-top: 12px; }
+.sw-links .rule-link { width: 100%; font: inherit; font-weight: 800; font-size: 14px; cursor: pointer; text-align: left; }
