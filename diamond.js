@@ -20,8 +20,26 @@
 (function (global) {
   "use strict";
 
+  /* 베이스 좌표 — 이 사이트의 모든 야구장(포지션 · 룰 · 선수 · 기본편)이 이 값 하나를 씀
+     포수 뒤에서 본 모습: 홈 = 아래, 1루 = 오른쪽, 2루 = 위, 3루 = 왼쪽
+     좌표는 viewBox(300×300) 기준이라 화면 크기가 바뀌어도 비율 그대로 늘어나고 줄어듦 */
+  const BASE_POSITIONS = {
+    home: [150, 258],
+    first: [214, 194],
+    second: [150, 130],
+    third: [86, 194]
+  };
+  // 주루 순서 (홈 → 1루 → 2루 → 3루 → 홈)
+  const ROUTE = ["home", "first", "second", "third", "home"];
+  // 시나리오 데이터에서 쓰는 짧은 이름
+  const BASE_ALIAS = { H: "home", B1: "first", B2: "second", B3: "third" };
+  const BASE_NAME = { home: "홈", first: "1루", second: "2루", third: "3루" };
+  // 베이스 이름표 위치: 주자 길(베이스 사이 선)과 겹치지 않게 다이아몬드 바깥쪽에 둠
+  const BASE_LABEL_POS = { home: [-26, 12], first: [18, 18], second: [0, -19], third: [-18, 18] };
+
   const PTS = {
-    H: [150, 258], B1: [214, 194], B2: [150, 130], B3: [86, 194],
+    H: BASE_POSITIONS.home, B1: BASE_POSITIONS.first, B2: BASE_POSITIONS.second, B3: BASE_POSITIONS.third,
+    home: BASE_POSITIONS.home, first: BASE_POSITIONS.first, second: BASE_POSITIONS.second, third: BASE_POSITIONS.third,
     P: [150, 196], C: [150, 282],
     "1B": [228, 162], "2B": [190, 142], SS: [110, 142], "3B": [72, 162],
     LF: [68, 98], CF: [150, 72], RF: [232, 98]
@@ -50,14 +68,23 @@
     return n;
   };
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  // 'H' / 'B1' / 'first' 같은 베이스 이름이면 표준 이름(home/first/...)으로, 아니면 null
+  const baseKey = (l) => (typeof l === "string" ? (BASE_ALIAS[l] || (BASE_POSITIONS[l] ? l : null)) : null);
+  // 주자가 a 베이스에서 b 베이스까지 앞으로 갈 때 밟는 베이스들 (a 제외, b 포함)
+  function routeBetween(a, b) {
+    const i = ROUTE.indexOf(a);
+    const j = b === "home" ? 4 : ROUTE.indexOf(b);
+    if (i < 0 || j <= i) return [b];
+    return ROUTE.slice(i + 1, j + 1);
+  }
   const reduceMotion = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   class BaseballDiamond {
     constructor(container, opts = {}) {
-      this.opts = Object.assign({ view: "full", fielders: true, labels: "code", baseLabels: false, caption: false, onFielderClick: null }, opts);
+      this.opts = Object.assign({ view: "full", fielders: true, labels: "code", baseLabels: true, caption: false, theme: "", onFielderClick: null }, opts);
       this.id = "bd" + (++uid);
       this.root = document.createElement("div");
-      this.root.className = "bd";
+      this.root.className = "bd" + (this.opts.theme ? " bd-" + this.opts.theme : "");
       container.appendChild(this.root);
       this.tokens = {};
       this.runId = 0;
@@ -96,22 +123,27 @@
       el("circle", { cx: 150, cy: 262, r: 20, class: "bd-dirt" }, svg);
       el("line", { x1: 150, y1: 258, x2: 9, y2: 117, class: "bd-foulline" }, svg);
       el("line", { x1: 150, y1: 258, x2: 291, y2: 117, class: "bd-foulline" }, svg);
-      el("polygon", { points: [PTS.H, PTS.B1, PTS.B2, PTS.B3].map((p) => p.join(",")).join(" "), class: "bd-basepath" }, svg);
+      el("polygon", { points: ["home", "first", "second", "third"].map((k) => BASE_POSITIONS[k].join(",")).join(" "), class: "bd-basepath" }, svg);
       el("circle", { cx: 150, cy: 196, r: 9, class: "bd-mound" }, svg);
       el("rect", { x: 146, y: 195, width: 8, height: 2, class: "bd-rubber" }, svg);
       this.zoneLabels = el("g", { class: "bd-zone-labels" }, svg);
       el("text", { x: 150, y: 172, class: "bd-zone-label in" }, this.zoneLabels).textContent = "내야";
       el("text", { x: 150, y: 100, class: "bd-zone-label out" }, this.zoneLabels).textContent = "외야";
 
+      // 베이스: 1·2·3루는 ◆, 홈은 오각형 ⬟ (모두 BASE_POSITIONS 기준)
       this.bases = {};
-      [1, 2, 3].forEach((n) => {
-        const [x, y] = PTS["B" + n];
-        this.bases[n] = el("rect", { x: x - 6.5, y: y - 6.5, width: 13, height: 13, rx: 1.5, transform: `rotate(45 ${x} ${y})`, class: "bd-base" }, svg);
+      ["first", "second", "third"].forEach((k, i) => {
+        const [x, y] = BASE_POSITIONS[k];
+        this.bases[i + 1] = el("rect", { x: x - 6.5, y: y - 6.5, width: 13, height: 13, rx: 1.5, transform: `rotate(45 ${x} ${y})`, class: "bd-base", "data-base": k }, svg);
       });
-      this.bases[0] = el("polygon", { points: "144,254 156,254 156,259 150,264 144,259", class: "bd-base bd-homeplate" }, svg);
+      const [hx, hy] = BASE_POSITIONS.home;
+      this.bases[0] = el("polygon", { points: `${hx - 6},${hy - 4} ${hx + 6},${hy - 4} ${hx + 6},${hy + 1} ${hx},${hy + 6} ${hx - 6},${hy + 1}`, class: "bd-base bd-homeplate", "data-base": "home" }, svg);
+      // 이름표는 주자·공보다 아래 층에 그려서 애니메이션을 가리지 않음
       if (this.opts.baseLabels) {
-        [["B1", "1루", 22, 14], ["B2", "2루", 0, -14], ["B3", "3루", -22, 14], ["H", "홈", 0, 22]].forEach(([k, t, dx, dy]) => {
-          el("text", { x: PTS[k][0] + dx, y: PTS[k][1] + dy, class: "bd-baselabel" }, svg).textContent = t;
+        const lg = el("g", { class: "bd-baselabels", "aria-hidden": "true" }, svg);
+        Object.keys(BASE_POSITIONS).forEach((k) => {
+          const [x, y] = BASE_POSITIONS[k], [dx, dy] = BASE_LABEL_POS[k];
+          el("text", { x: x + dx, y: y + dy, class: "bd-baselabel" }, lg).textContent = BASE_NAME[k];
         });
       }
 
@@ -128,6 +160,7 @@
       this.place(this.ball, PTS.P, false);
 
       this.root.appendChild(svg);
+      this.setView(this.opts.view);
     }
 
     addFielder(code) {
@@ -163,10 +196,25 @@
         node.style.transform = `translate(${x}px, ${y}px)`;
       }
       node._pos = [x, y];
+      node._base = baseKey(l);
+    }
+
+    // 주자를 베이스까지 이동: 두 베이스 이상 떨어져 있으면 중간 베이스를 순서대로 밟고 감
+    moveRunner(node, target, ms) {
+      const to = baseKey(target);
+      const from = node._base;
+      const legs = to && from && to !== from ? routeBetween(from, to) : null;
+      if (!legs || legs.length < 2) { this.place(node, target, true, ms); return; }
+      const run = this.runId, leg = ms / legs.length;
+      legs.forEach((b, k) => setTimeout(() => { if (run === this.runId) this.place(node, b, true, leg); }, k * leg));
     }
 
     /* ---------- 정적 상태 ---------- */
-    setView(v) { this.svg.setAttribute("viewBox", VIEWS[v] || VIEWS.full); }
+    setView(v) {
+      this.svg.setAttribute("viewBox", VIEWS[v] || VIEWS.full);
+      // 내야만 보이는 화면에서는 가장자리에 잘려 보이는 외야수(LF·CF·RF)를 숨김
+      this.svg.classList.toggle("view-infield", v === "infield");
+    }
 
     setZone(z) {
       this.svg.classList.toggle("zone-in", z === "infield");
@@ -276,9 +324,11 @@
             this.ball.classList.remove("hidden");
             if (step.throw !== false && from) this.trail(from, loc(target));
             this.place(this.ball, target, true, ms);
+          } else if (this.fielders[id]) {
+            this.place(this.fielders[id], target, true, ms);
+            this.fielders[id].classList.add("act");
           } else if (this.tokens[id]) {
-            this.place(this.tokens[id], target, true, ms);
-            if (this.fielders[id]) this.fielders[id].classList.add("act");
+            this.moveRunner(this.tokens[id], target, ms);
           }
         });
       }
@@ -301,12 +351,13 @@
       }
       (step.bubble || []).forEach((b) => this.bubble(b.at, b.text, b.kind || ""));
       if (step.flash) step.flash.forEach((b) => {
-        const n = { H: 0, B1: 1, B2: 2, B3: 3 }[b];
+        const n = { H: 0, B1: 1, B2: 2, B3: 3, home: 0, first: 1, second: 2, third: 3 }[b];
         const node = this.bases[n];
         if (!node) return;
         node.classList.remove("flash"); void node.getBoundingClientRect(); node.classList.add("flash");
       });
       if (step.bases) this.setBases(step.bases);
+      if (step.arrows) this.setArrows(step.arrows);
       return dur;
     }
 
@@ -345,6 +396,9 @@
   }
 
   BaseballDiamond.PTS = PTS;
+  BaseballDiamond.BASE_POSITIONS = BASE_POSITIONS;
+  BaseballDiamond.ROUTE = ROUTE;
+  BaseballDiamond.routeBetween = routeBetween;
   BaseballDiamond.POS_KO = POS_KO;
   BaseballDiamond.FIELDERS = FIELDERS;
   global.BaseballDiamond = BaseballDiamond;

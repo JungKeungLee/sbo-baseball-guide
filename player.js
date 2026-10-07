@@ -18,7 +18,10 @@
     { key: "summary", label: "요약", icon: "🏁" }
   ];
   // 역할별 추가 탭 (player-data.js 의 extraTabs) — 요약 바로 앞에 끼워 넣음
-  const EXTRA_TABS = { swing: { key: "swing", label: "스윙 비교", icon: "🏏" } };
+  const EXTRA_TABS = {
+    swing: { key: "swing", label: "스윙 비교", icon: "🏏" },
+    pitches: { key: "pitches", label: "구종", icon: "🌀" }
+  };
   function tabsOf(r) {
     const t = BASE_TABS.slice();
     (r.extraTabs || []).forEach((k) => { if (EXTRA_TABS[k]) t.splice(t.length - 1, 0, EXTRA_TABS[k]); });
@@ -290,6 +293,11 @@
 
     swing(el) {
       renderSwing(el);
+      pendingTip = null;
+    },
+
+    pitches(el) {
+      renderPitches(el);
       pendingTip = null;
     },
 
@@ -571,6 +579,223 @@
       questions: playerQuizzes, indices, resultLabel: "스윙 감 잡기",
       load: () => state.quiz.swing,
       put: (v) => { state.quiz.swing = v; save(); }
+    }));
+
+    $$(".sw-links [data-go]", el).forEach((b) => b.addEventListener("click", () => {
+      const [tab, tip] = b.dataset.go.split(":");
+      pendingTip = tip || null;
+      goTab(tab);
+    }));
+  }
+
+  /* ---------------- 투수 · 구종 ----------------
+     데이터: player-data.js 의 pitcherPitches
+     공 궤적을 두 칸으로 보여줌 — 위에서 본 모습(옆으로 휘는지) / 옆에서 본 모습(떨어지는지)
+     두 칸의 공은 같은 시간에 같이 움직이고, 구종마다 걸리는 시간(ms)이 달라 빠르기 차이가 보임
+  */
+  const PP = pitcherPitches;
+  const pitchOf = (k) => PP.pitches.find((p) => p.key === k);
+  const PX0 = 32, PX1 = 288;            // 투수 손 → 홈플레이트 (가로 위치)
+  const TOP_Y = 50, SIDE_Y0 = 26, SIDE_SLOPE = 24, DROP_K = 0.75;
+  // t(0~1) 지점의 공 위치 — 위에서 본 칸 / 옆에서 본 칸
+  function pitchAt(m, t) {
+    const x = PX0 + (PX1 - PX0) * t;
+    const lat = m.lat * Math.pow(t, m.latPow || 2);
+    let drop = m.drop * Math.pow(t, m.dropPow || 2) - (m.lift || 0) * Math.sin(Math.PI * t);
+    if (m.late && t > m.late.from) drop += m.late.amount * Math.pow((t - m.late.from) / (1 - m.late.from), 2);
+    // 글러브 쪽(+)은 화면 위쪽 = 1루 쪽, 오른손 타자는 화면 아래쪽에 서 있음
+    return { top: [x, TOP_Y - lat], side: [x, SIDE_Y0 + SIDE_SLOPE * t + drop * DROP_K] };
+  }
+  const pitchPath = (m, view, upto = 1) => {
+    const pts = [];
+    for (let i = 0; i <= 40; i++) { const t = (i / 40) * upto; pts.push(pitchAt(m, t)[view].map((v) => v.toFixed(1)).join(",")); }
+    return pts.join(" ");
+  };
+
+  function pitchPanels() {
+    return `
+      <div class="pt-panel">
+        <p class="pt-cap">🔭 위에서 본 모습 <small>옆으로 휘는지</small></p>
+        <svg class="pt-svg top" viewBox="0 0 320 100" aria-hidden="true">
+          <rect width="320" height="100" rx="14" class="pt-bg"/>
+          <line x1="${PX0}" y1="${TOP_Y}" x2="${PX1}" y2="${TOP_Y}" class="pt-center"/>
+          <circle cx="22" cy="${TOP_Y}" r="12" class="pt-mound"/><text x="22" y="${TOP_Y + 4}" class="pt-who">투수</text>
+          <polygon points="${PX1 - 4},${TOP_Y - 7} ${PX1 + 4},${TOP_Y - 7} ${PX1 + 9},${TOP_Y} ${PX1 + 4},${TOP_Y + 7} ${PX1 - 4},${TOP_Y + 7}" class="pt-plate"/>
+          <circle cx="${PX1 + 4}" cy="${TOP_Y + 30}" r="8" class="pt-batter"/><text x="${PX1 - 8}" y="${TOP_Y + 46}" class="pt-small">오른손 타자</text>
+          <text x="${PX1 - 2}" y="12" class="pt-small">1루 쪽 ↑</text>
+          <g class="pt-lines"></g>
+        </svg>
+      </div>
+      <div class="pt-panel">
+        <p class="pt-cap">👀 옆에서 본 모습 <small>떨어지는지</small></p>
+        <svg class="pt-svg side" viewBox="0 0 320 100" aria-hidden="true">
+          <rect width="320" height="100" rx="14" class="pt-bg"/>
+          <line x1="0" y1="93" x2="320" y2="93" class="pt-ground"/>
+          <path d="M6,93 Q22,80 38,93 Z" class="pt-moundside"/>
+          <circle cx="22" cy="22" r="6" class="pt-body"/><path d="M22,28 L22,52 M22,52 L14,78 M22,52 L30,78 M22,34 L36,${SIDE_Y0}" class="pt-limb"/>
+          <rect x="${PX1 - 6}" y="46" width="12" height="34" rx="2" class="pt-zone"/>
+          <text x="${PX1 - 26}" y="52" class="pt-small">스트라이크존 →</text>
+          <circle cx="${PX1 + 18}" cy="26" r="6" class="pt-body"/><path d="M${PX1 + 18},32 L${PX1 + 18},60 M${PX1 + 18},60 L${PX1 + 12},90 M${PX1 + 18},60 L${PX1 + 24},90" class="pt-limb"/>
+          <g class="pt-lines"></g>
+        </svg>
+      </div>`;
+  }
+
+  // keys: 보여줄 구종들, el: 그림을 넣을 곳 → { play() }
+  function PitchViewer(el, keys) {
+    el.innerHTML = pitchPanels() + `<p class="pt-result" aria-live="polite"></p>`;
+    const views = { top: $(".pt-svg.top", el), side: $(".pt-svg.side", el) };
+    const items = keys.map((k, i) => {
+      const p = pitchOf(k), m = p.motion;
+      const it = { p, m, cls: "pc-" + i };
+      ["top", "side"].forEach((v) => {
+        const g = $(".pt-lines", views[v]);
+        g.insertAdjacentHTML("beforeend", `<polyline points="${pitchPath(m, v)}" class="pt-ghost ${it.cls}"/><polyline class="pt-trail ${it.cls}" points=""/><circle r="5" class="pt-ball ${it.cls}" cx="${PX0}" cy="${pitchAt(m, 0)[v][1]}"/>`);
+        it[v] = { trail: g.lastElementChild.previousElementSibling, ball: g.lastElementChild };
+      });
+      return it;
+    });
+    let raf = 0, fbs = [], run = 0;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const setT = (it, t) => ["top", "side"].forEach((v) => {
+      const [x, y] = pitchAt(it.m, t)[v];
+      it[v].ball.setAttribute("cx", x); it[v].ball.setAttribute("cy", y);
+      it[v].trail.setAttribute("points", pitchPath(it.m, v, t));
+    });
+    const result = $(".pt-result", el);
+    function finish() {
+      const order = items.slice().sort((a, b) => a.m.ms - b.m.ms);
+      result.innerHTML = items.length > 1
+        ? `🏁 도착 순서: ${order.map((it) => `<b class="${it.cls}">${it.p.name}</b>`).join(" → ")}`
+        : "🏁 포수 미트 도착!";
+    }
+    function play() {
+      const my = ++run;
+      cancelAnimationFrame(raf); fbs.forEach(clearTimeout); fbs = [];
+      result.innerHTML = "";
+      items.forEach((it) => setT(it, 0));
+      const k = reduce ? 0.5 : 1, t0 = performance.now();
+      const longest = Math.max(...items.map((it) => it.m.ms)) * k;
+      const tick = (now) => {
+        if (my !== run) return;
+        const e = now - t0;
+        items.forEach((it) => setT(it, Math.min(1, e / (it.m.ms * k))));
+        if (e < longest) raf = requestAnimationFrame(tick); else finish();
+      };
+      raf = requestAnimationFrame(tick);
+      // 탭이 백그라운드라 프레임이 안 돌아도 끝 장면은 맞춰 둠
+      fbs.push(setTimeout(() => { if (my !== run) return; cancelAnimationFrame(raf); items.forEach((it) => setT(it, 1)); finish(); }, longest + 150));
+    }
+    return { play };
+  }
+
+  function renderPitches(el) {
+    let cur = 0;
+    el.innerHTML = `
+      <section class="sw-intro">
+        <div class="sw-badges"><span class="plv plv-good">👍 알아두면 좋음</span><span class="plv plv-tip">📺 중계 볼 때 도움</span></div>
+        <h3 class="sw-title">${PP.title}</h3>
+        <p>${PP.intro}</p>
+        <p class="rg-one">💬 ${PP.one}</p>
+      </section>
+
+      <section class="sw-block">
+        <h4 class="sw-h">⚾ 구종 하나씩 보기</h4>
+        <div class="pt-tabs" role="tablist">${PP.pitches.map((p, i) => `<button data-i="${i}">${p.icon} ${p.name}</button>`).join("")}</div>
+        <div class="pt-card-host"></div>
+      </section>
+
+      <section class="sw-block">
+        <h4 class="sw-h">🔀 한번에 비교</h4>
+        <div class="pt-presets">${PP.presets.map((p, i) => `<button data-i="${i}">${p.label}</button>`).join("")}</div>
+        <div class="pt-cmp"></div>
+        <p class="pt-note"></p>
+        <button class="btn btn-primary pt-replay">▶ 다시 비교하기</button>
+      </section>
+
+      <section class="sw-block pt-keycmp"></section>
+      <section class="sw-block pt-qcards"></section>
+      <section class="sw-block sw-quiz"></section>
+
+      <p class="sw-notice">※ ${PP.notice}</p>
+
+      <div class="rule-links sw-links">
+        <button class="rule-link" data-go="basic">⚾ 투수 기본 가이드 보기 <span>→</span></button>
+        <button class="rule-link" data-go="tips:p-strike">🎯 왜 빠른 공보다 스트라이크가 먼저일까? <span>→</span></button>
+        <button class="rule-link" data-go="quiz">✏️ 투수 미니퀴즈 보기 <span>→</span></button>
+      </div>`;
+
+    // 구종 카드 (모바일에서 한 번에 하나)
+    const host = $(".pt-card-host", el);
+    const showPitch = (i) => {
+      cur = (i + PP.pitches.length) % PP.pitches.length;
+      const p = PP.pitches[cur];
+      $$(".pt-tabs button", el).forEach((b) => b.classList.toggle("active", +b.dataset.i === cur));
+      const act = $(".pt-tabs .active", el), nav = $(".pt-tabs", el);
+      nav.scrollLeft = act.offsetLeft - nav.clientWidth / 2 + act.clientWidth / 2;
+      host.innerHTML = "";
+      const card = h(`<article class="pt-card">
+        <p class="pt-name"><span>${p.icon}</span>${p.name}${p.alias ? ` <small>${p.alias}</small>` : ""}</p>
+        <p class="pt-one">${p.one}</p>
+        <div class="pt-view"></div>
+        <div class="pt-speed"><span>빠르기 느낌</span><b>${p.speed}</b><i class="dots">${"●".repeat(p.dots)}<em>${"●".repeat(5 - p.dots)}</em></i><button class="pt-again">↻ 다시 보기</button></div>
+        <p class="pt-why-t">왜 던지나요?</p>
+        <ul class="key">${p.why.map((w) => `<li>${w}</li>`).join("")}</ul>
+      </article>`);
+      host.appendChild(card);
+      const v = PitchViewer($(".pt-view", card), [p.key]);
+      $(".pt-again", card).addEventListener("click", () => v.play());
+      cardActions(card, { more: [h(`<p class="more-text">${p.desc}</p>`), h(`<p class="more-text">💡 ${p.detail}</p>`)] });
+      card.appendChild(h(`<div class="pt-pager"><button class="btn btn-ghost pt-prev">← 이전 구종</button><button class="btn btn-ghost pt-next">다음 구종 →</button></div>`));
+      $(".pt-prev", card).addEventListener("click", () => showPitch(cur - 1));
+      $(".pt-next", card).addEventListener("click", () => showPitch(cur + 1));
+      v.play();
+    };
+    $$(".pt-tabs button", el).forEach((b) => b.addEventListener("click", () => showPitch(+b.dataset.i)));
+    showPitch(0);
+
+    // 한번에 비교
+    let cmp = null;
+    const showPreset = (i) => {
+      const pr = PP.presets[i];
+      $$(".pt-presets button", el).forEach((b) => b.classList.toggle("active", +b.dataset.i === i));
+      cmp = PitchViewer($(".pt-cmp", el), pr.keys);
+      $(".pt-note", el).innerHTML = `<span class="pt-legend">${pr.keys.map((k, j) => `<b class="pc-${j}"><i></i>${pitchOf(k).name}</b>`).join("")}</span>${pr.note}`;
+      cmp.play();
+    };
+    $$(".pt-presets button", el).forEach((b) => b.addEventListener("click", () => showPreset(+b.dataset.i)));
+    $(".pt-replay", el).addEventListener("click", () => cmp && cmp.play());
+    showPreset(0);
+
+    // 꼭 알아둘 비교 2개
+    const kc = $(".pt-keycmp", el);
+    kc.insertAdjacentHTML("beforeend", `<h4 class="sw-h">⭐ 초보자에게 가장 중요한 비교</h4>`);
+    PP.keyCompares.forEach((c) => {
+      const card = h(`<article class="pt-qcard"><p class="pt-qsub">${c.sub}</p><p class="pt-qtitle">${c.title}</p></article>`);
+      card.appendChild(renderCompare({ cols: c.cols, note: c.note }));
+      kc.appendChild(card);
+    });
+
+    // 질문형 카드: 변화구란? / 직구만 던지면 안 돼요?
+    const qc = $(".pt-qcards", el);
+    [PP.breaking, PP.whyMix].forEach((c) => {
+      const card = h(`<article class="pt-qcard">
+        <p class="pt-qtitle">“${c.q}”</p>
+        <p class="pt-qone">${c.one}</p>
+        <p class="more-text">${c.text}</p>
+        ${c.mix ? `<div class="pt-mix">${c.mix.map((m) => `<span>${m}</span>`).join("")}</div>` : ""}
+      </article>`);
+      if (c.detail) cardActions(card, { more: [h(`<p class="more-text">${c.detail}</p>`)] });
+      qc.appendChild(card);
+    });
+
+    // 미니퀴즈
+    const indices = playerQuizzes.map((q, i) => (q.role === "pitch" ? i : -1)).filter((i) => i >= 0);
+    $(".sw-quiz", el).appendChild(createQuiz({
+      id: "pquiz-pitch", title: "✏️ 구종 미니퀴즈", level: 2,
+      questions: playerQuizzes, indices, resultLabel: "구종 감 잡기",
+      load: () => state.quiz.pitch,
+      put: (v) => { state.quiz.pitch = v; save(); }
     }));
 
     $$(".sw-links [data-go]", el).forEach((b) => b.addEventListener("click", () => {

@@ -198,6 +198,7 @@ const playerRoles = [
   },
   {
     key: "pitcher", name: "투수", icon: "⚾", sub: "PITCHER", color: "pitcher",
+    extraTabs: ["pitches"], // 투수만 있는 탭: 구종 (pitcherPitches)
     title: "내가 오늘 투수라면?",
     intro: ["투수의 목표는 단순히 가장 빠른 공을 던지는 게 아니에요.", "초보자에게 가장 중요한 건", "<b>스트라이크를 안정적으로 던지는 것!</b>"],
     one: "빠른 공보다 먼저 스트라이크",
@@ -415,7 +416,7 @@ const playerQuizzes = [
   // 타자
   { role: "batter", type: "situation", category: "batting", question: "공을 쳤는데 내야 땅볼이 나왔어요. 가장 먼저 해야 할 행동은?", options: ["타구를 구경한다", "바로 1루로 달린다", "벤치를 본다", "홈플레이트에서 기다린다"], answer: 1, explanation: "치면 <b>바로 1루로!</b>" },
   { role: "batter", type: "ox", category: "batting", question: "볼 3개 상황에서 스트라이크존을 크게 벗어난 공이 들어왔어요. 무조건 휘둘러야 할까요?", options: ["네", "아니요"], answer: 1, explanation: "볼이면 <b>볼넷</b>! 나쁜 공은 보내도 돼요." },
-  { role: "batter", type: "choice", category: "terminology", question: "2스트라이크에서 일반 스윙으로 파울이 났어요. 어떻게 될까요?", options: ["삼진 아웃", "그대로 2스트라이크", "볼넷", "1루로 진루"], answer: 1, explanation: "일반 파울은 2스트라이크 이후엔 카운트가 안 늘어요." },
+  { role: "batter", type: "choice", category: "terminology", question: "2스트라이크에서 일반 스윙으로 파울이 났어요. 어떻게 될까요?", options: ["삼진 아웃", "그대로 2스트라이크", "볼넷", "타자가 1루로 간다"], answer: 1, explanation: "일반 파울은 2스트라이크 이후엔 카운트가 안 늘어요." },
   { role: "batter", type: "choice", category: "batting", question: "1루에 거의 도착했어요. 어떻게 달릴까요?", options: ["멈출 준비를 하며 속도를 줄인다", "베이스를 밟을 때까지 전력질주"], answer: 1, explanation: "1루는 지나쳐도 곧장 돌아오면 괜찮아요. <b>끝까지 전력질주!</b>" },
   { role: "batter", type: "choice", category: "batting", question: "친 공이 파울 같았는데 심판이 아직 아무 콜도 안 했어요.", options: ["혼자 멈춘다", "심판 콜을 확인하며 계속 뛴다"], answer: 1, explanation: "<b>내 판단보다 심판 콜!</b> 콜이 나올 때까지 플레이는 계속돼요." },
   { role: "batter", type: "choice", category: "situation", question: "타석에 들어가기 전에 확인하면 좋은 것은?", options: ["아웃카운트와 주자 위치", "관중 수", "상대 유니폼 색", "전광판 광고"], answer: 0, explanation: "<b>아웃카운트와 주자</b>를 알면 무엇을 해야 할지 보여요." },
@@ -428,12 +429,17 @@ const playerQuizzes = [
   { role: "pitcher", type: "choice", category: "situation", question: "1루수 쪽 땅볼이라 1루수가 공을 잡으러 나갔어요. 1루가 비었어요. 투수는?", options: ["1루로 달려가 커버", "마운드에 서 있는다", "홈으로 간다", "3루를 커버한다"], answer: 0, explanation: "<b>1루 커버!</b> 투구 후에도 플레이에 참여해요." },
   // 포수
   { role: "catcher", type: "choice", category: "steal", question: "1루 주자가 2루 도루를 시도해요. 포수가 공을 받은 다음 할 수 있는 플레이는?", diagram: { runners: [1] }, options: ["2루로 송구해 도루 저지를 시도한다", "투수에게 돌려준다", "1루로 던진다", "공을 들고 기다린다"], answer: 0, explanation: "<b>2루로 빠르게 송구!</b>" },
-  { role: "catcher", type: "choice", category: "catching", question: "투수 공이 땅에 튀어 잡기 어려워요. 가장 중요한 것은?", options: ["몸으로 막아서 뒤로 빠지는 것을 줄인다", "피한다", "일어서서 기다린다", "글러브만 쭉 뻗는다"], answer: 0, explanation: "<b>뒤로 안 빠지게 막는 것</b>이 먼저예요." },
-  { role: "catcher", type: "choice", category: "terminology", question: "포수가 잡을 만한 공을 놓쳐서 주자가 진루했어요. 뭐라고 기록할까요?", options: ["폭투", "포일", "보크", "도루"], answer: 1, explanation: "포수가 놓친 건 <b>포일(PB)</b>, 투수가 어렵게 던진 건 폭투(WP)!" },
+  { role: "catcher", type: "choice", category: "catching", question: "투수가 던진 공이 땅에 튀어서 잡기 어려워요. 포수에게 가장 중요한 것은?", options: ["몸으로 막아서 뒤로 빠지는 것을 줄인다", "피한다", "일어서서 기다린다", "글러브만 쭉 뻗는다"], answer: 0, explanation: "<b>뒤로 안 빠지게 막는 것</b>이 먼저예요." },
+  { role: "catcher", type: "choice", category: "terminology", question: "포수가 충분히 잡을 수 있는 공을 놓쳐서, 그 사이 주자가 다음 베이스로 갔어요. 이걸 뭐라고 할까요?", options: ["폭투", "포일", "보크", "도루"], answer: 1, explanation: "포수가 놓친 건 <b>포일(PB)</b>, 투수가 어렵게 던진 건 폭투(WP)!" },
   { role: "catcher", type: "choice", category: "situation", question: "3루 주자가 홈으로 뛰고 외야에서 홈으로 공이 들어와요. 포수는?", diagram: { runners: [3] }, options: ["공과 주자를 같이 보며 홈에서 태그 준비", "1루를 커버하러 간다", "공만 보고 주자는 무시", "홈을 비운다"], answer: 0, explanation: "홈에서 <b>공을 받아 태그</b>할 준비!" },
   { role: "catcher", type: "choice", category: "terminology", question: "포수 뒤쪽 파울 지역으로 높이 뜬 공을 땅에 떨어지기 전에 잡았어요.", options: ["타자 아웃", "그냥 파울", "볼", "다시 투구"], answer: 0, explanation: "파울 지역이어도 잡으면 <b>아웃</b>!" },
   { role: "catcher", type: "choice", category: "situation", question: "2아웃에서 세 번째 스트라이크를 놓쳤고 타자가 1루로 뛰어요.", options: ["타자를 태그하거나 1루로 송구한다", "이미 삼진이니 신경 안 쓴다"], answer: 0, explanation: "<b>낫아웃</b> 상황! 아웃을 마무리해야 해요." },
   // 타자 · 스윙 비교 미니퀴즈
+  // 투수 · 구종 미니퀴즈
+  { role: "pitch", type: "choice", category: "pitching", question: "직구처럼 보이지만 속도를 늦춰 타자의 타이밍을 빼앗는 공은?", options: ["직구", "체인지업", "커브", "슬라이더"], answer: 1, explanation: "<b>체인지업</b>! 직구인 줄 알고 휘두르면 공이 아직 안 와 있어요." },
+  { role: "pitch", type: "choice", category: "pitching", question: "타자 앞에서 아래로 뚝 떨어지는 느낌의 공은?", options: ["포크 / 스플리터", "직구", "투심", "견제구"], answer: 0, explanation: "<b>포크 / 스플리터</b>는 처음엔 곧게 오다가 타자 앞에서 뚝 떨어져요. (견제구는 주자를 잡으려고 베이스로 던지는 공이에요)" },
+  { role: "pitch", type: "choice", category: "pitching", question: "비교적 빠르게 오면서 옆으로 휘는 느낌이 강한 공은?", options: ["커브", "슬라이더", "체인지업", "직구"], answer: 1, explanation: "<b>슬라이더</b>! 커브보다 빠르고, 옆으로 빠지는 느낌이 강해요." },
+  { role: "pitch", type: "choice", category: "pitching", question: "투수가 여러 구종을 섞어 던지는 가장 쉬운 이유는?", options: ["타자가 다음 공의 속도와 움직임을 쉽게 예상하지 못하게 하려고", "심판이 정해준 순서라서", "공이 더 잘 보이게 하려고", "주자를 잡으려고"], answer: 0, explanation: "같은 공만 오면 타자가 금방 익숙해져요. 그래서 <b>빠르기와 움직임을 섞어</b> 예상을 흔들어요." },
   { role: "swing", type: "choice", category: "batting", question: "공을 띄우는 느낌이 강한 스윙은?", options: ["다운스윙", "업스윙", "레벨스윙"], answer: 1, explanation: "<b>업스윙</b>은 맞힌 뒤 위로 퍼 올리듯 지나가서 공을 띄우는 느낌이 강해요." },
   { role: "swing", type: "choice", category: "batting", question: "배트가 비교적 평평하게 들어가는 느낌의 스윙은?", options: ["레벨스윙", "다운스윙", "포스아웃"], answer: 0, explanation: "<b>레벨스윙</b>! (포스아웃은 스윙이 아니라 수비 규칙이에요 😉)" },
   { role: "swing", type: "choice", category: "batting", question: "다운스윙을 가장 쉽게 설명한 것은?", options: ["배트를 무조건 아래로 찍는 것", "공을 향해 자연스럽게 내려오며 들어가는 것", "스윙 없이 공을 보는 것"], answer: 1, explanation: "무조건 찍는 게 아니라 <b>공을 향해 자연스럽게 내려오며</b> 들어가는 느낌이에요." },
@@ -497,4 +503,113 @@ const batterSwing = {
     { bad: "세 가지 중 하나만 정답이다", good: "실제로는 선수마다 스윙이 조금씩 달라요" }
   ],
   notice: "이 설명은 초보자용 간단 안내예요. 실제 선수들의 스윙은 사람마다 다를 수 있고, 여기서는 차이를 쉽게 이해하는 데 목적이 있어요."
+};
+
+
+/* ---------- 투수 · 구종 (직구 / 투심 / 슬라이더 / 커브 / 체인지업 / 포크·스플리터) ----------
+   전문 투구 레슨이 아니라 "저건 직구구나, 체인지업은 늦게 오는구나" 정도를 알아보는 용도
+   motion: 공 궤적을 만드는 값 (그림 단위, 오른손 투수 기준 예시)
+     lat  : 옆으로 움직이는 양 (+ 는 글러브 쪽, - 는 던지는 팔 쪽) / latPow: 언제 휘는지 (클수록 늦게)
+     drop : 직구보다 더 떨어지는 양 / dropPow: 언제 떨어지는지 (클수록 늦게)
+     lift : 처음에 살짝 떠오르는 듯한 느낌 (커브)
+     late : { from: 0~1, amount } 그 지점부터 갑자기 떨어지는 양 (포크·스플리터)
+     ms   : 투수 → 포수까지 걸리는 시간 (슬로 모션, 상대적인 빠르기만 보여줌)
+*/
+const pitcherPitches = {
+  title: "투수가 던지는 공은 다 똑같을까?",
+  intro: "아니에요! 투수는 <b>빠르기</b>와 <b>움직임</b>이 다른 공을 섞어 던져요. 이걸 <b>구종</b>이라고 해요. 이름을 다 외울 필요는 없고, “빠른지 느린지, 휘는지 떨어지는지”만 보면 돼요.",
+  one: "구종은 공의 빠르기와 움직임이 달라요.",
+  notice: "공 궤적과 빠르기는 차이를 쉽게 보여주려고 단순하게 그린 예시예요. 실제 움직임과 구속은 투수마다 크게 달라요. (오른손 투수 기준, 슬로 모션)",
+  pitches: [
+    {
+      key: "four", name: "직구", alias: "패스트볼 · 포심", icon: "⚡",
+      one: "빠르게 쭉 들어오는 <b>기본 공</b>",
+      desc: "가장 기본적인 빠른 공이에요. 다른 구종은 모두 이 공과 비교해서 “얼마나 느린지, 얼마나 휘는지”로 이야기해요.",
+      speed: "빠름", dots: 5,
+      why: ["타자와 힘으로 승부하기", "다른 구종의 기준이 되는 공", "빠르게 스트라이크를 잡기"],
+      detail: "중계에서 “포심”이라고 하면 보통 이 직구를 말해요. 실제로는 중력 때문에 조금씩 떨어지지만, 다른 공보다 덜 떨어져서 타자에게는 “떠오르는 것처럼” 느껴지기도 해요.",
+      motion: { lat: 0, latPow: 2, drop: 4, dropPow: 2, ms: 900 }
+    },
+    {
+      key: "two", name: "투심", alias: "투심 패스트볼", icon: "〰️",
+      one: "직구처럼 오다가 <b>끝에서 살짝 움직이는</b> 공",
+      desc: "직구처럼 빠르게 오지만, 타자 근처에서 던지는 팔 쪽으로 살짝 휘거나 가라앉아요.",
+      speed: "빠름", dots: 5,
+      why: ["배트 중심을 살짝 피하기", "땅볼 유도", "직구인 줄 알게 만들기"],
+      detail: "직구는 비교적 곧게, 투심은 끝에서 조금 움직여요. 비슷한 움직임의 “싱커”와 같이 부르기도 해요.",
+      motion: { lat: -12, latPow: 3, drop: 12, dropPow: 3, ms: 950 }
+    },
+    {
+      key: "slider", name: "슬라이더", alias: "", icon: "↪️",
+      one: "빠르게 오다가 <b>옆으로 빠지는</b> 공",
+      desc: "타자에게 가까워지면서 옆으로 휘는 느낌의 공이에요.",
+      speed: "중간~빠름", dots: 4,
+      why: ["헛스윙 유도", "배트 중심을 피하기", "타자의 타이밍 흔들기"],
+      detail: "커브보다 빠르고 덜 크게 휘어요. 오른손 투수가 던지면 보통 오른손 타자 몸에서 멀어지는 쪽(바깥쪽)으로 빠져나가요.",
+      motion: { lat: 30, latPow: 2.6, drop: 10, dropPow: 2, ms: 1100 }
+    },
+    {
+      key: "curve", name: "커브", alias: "커브볼", icon: "🌈",
+      one: "크게 휘면서 <b>떨어지는</b> 공",
+      desc: "큰 곡선을 그리면서 아래로 떨어지는 느낌의 공이에요. 슬라이더보다 느린 대신 움직임이 커요.",
+      speed: "느림~중간", dots: 2,
+      why: ["타자 눈높이를 흔들기", "빠른 공과 속도 차이 만들기", "헛스윙 · 루킹 스트라이크 유도"],
+      detail: "처음엔 살짝 떠오르는 듯 보이다가 크게 떨어져서, 타자가 공 높이를 맞추기 어려워요.",
+      motion: { lat: 14, latPow: 2, drop: 46, dropPow: 2, lift: 10, ms: 1600 }
+    },
+    {
+      key: "change", name: "체인지업", alias: "", icon: "🐢",
+      one: "직구인 줄 알았는데 <b>생각보다 늦게 오는</b> 공",
+      desc: "타자에게는 직구처럼 보이게 던지지만 실제 속도는 더 느려요. 그래서 타자의 타이밍을 빼앗아요.",
+      speed: "직구보다 느림", dots: 3,
+      why: ["타자가 직구인 줄 알고 먼저 휘두르게 만들기", "타이밍 빼앗기", "빠른 공을 더 빠르게 느끼게 하기"],
+      detail: "단순히 “느린 공”이 아니라 <b>직구처럼 보이는데 느린 공</b>이라는 게 포인트예요. 타자가 직구 타이밍에 방망이를 내면 공이 아직 안 와 있어요. 살짝 가라앉는 움직임이 있는 경우도 많아요.",
+      motion: { lat: -6, latPow: 2, drop: 14, dropPow: 2, ms: 1450 }
+    },
+    {
+      key: "fork", name: "포크 / 스플리터", alias: "포크볼", icon: "⤵️",
+      one: "앞에서 <b>뚝 떨어지는</b> 공",
+      desc: "처음엔 직구처럼 곧게 오다가 타자 앞에서 갑자기 아래로 떨어지는 느낌의 공이에요.",
+      speed: "중간~빠름", dots: 4,
+      why: ["헛스윙 유도", "땅볼 유도", "직구와 헷갈리게 만들기"],
+      detail: "포크와 스플리터는 비슷하게 떨어지는 공이에요. 정확한 차이는 몰라도 “앞에서 뚝 떨어지는 공”으로 기억하면 충분해요. 중계에서는 “포크볼”이라는 말을 자주 들어요.",
+      motion: { lat: 2, latPow: 2, drop: 6, dropPow: 2, late: { from: 0.6, amount: 36 }, ms: 1100 }
+    }
+  ],
+  presets: [
+    { label: "직구 vs 체인지업", keys: ["four", "change"], note: "길은 거의 같아 보이지만 <b>체인지업이 늦게 도착</b>해요. 이 시간 차이로 타이밍을 뺏어요." },
+    { label: "직구 vs 슬라이더", keys: ["four", "slider"], note: "슬라이더는 직구처럼 오다가 <b>옆으로 빠져요</b>. (위에서 본 그림을 보세요)" },
+    { label: "슬라이더 vs 커브", keys: ["slider", "curve"], note: "슬라이더는 <b>빠르고 옆으로</b>, 커브는 <b>느리고 크게 떨어져요</b>." },
+    { label: "직구 vs 투심 vs 포크", keys: ["four", "two", "fork"], note: "셋 다 처음엔 비슷하지만, 투심은 끝에서 살짝 움직이고 포크는 <b>뚝</b> 떨어져요." }
+  ],
+  keyCompares: [
+    {
+      title: "직구 vs 체인지업", sub: "초보자에게 가장 중요한 비교 ①",
+      cols: [
+        { title: "⚡ 직구", tone: "sky", lines: ["<b>빠름</b>", "빠르게 쭉 들어와요"] },
+        { title: "🐢 체인지업", tone: "green", lines: ["직구처럼 보이지만 <b>느림</b>", "생각보다 늦게 와요"] }
+      ],
+      note: "핵심: <b>속도 차이로 타자의 타이밍을 흔들어요.</b>"
+    },
+    {
+      title: "슬라이더 vs 커브", sub: "초보자에게 가장 중요한 비교 ②",
+      cols: [
+        { title: "↪️ 슬라이더", tone: "sky", lines: ["<b>빠르고</b> 옆으로 휘는 느낌"] },
+        { title: "🌈 커브", tone: "gold", lines: ["더 <b>크게 휘면서 떨어지는</b> 느낌", "더 느려요"] }
+      ],
+      note: "핵심: <b>둘 다 변화구지만 움직임 느낌이 달라요.</b>"
+    }
+  ],
+  breaking: {
+    q: "‘변화구’는 뭐예요?",
+    one: "<b>휘거나 떨어지거나 속도를 바꿔 타자를 속이는 공</b>",
+    text: "직구처럼 곧고 빠르게만 오는 게 아니라, 공의 속도나 움직임을 바꿔서 타자를 어렵게 만드는 공들을 쉽게 부르는 말이에요. 슬라이더 · 커브 · 체인지업 · 포크가 대표적이에요.",
+    detail: "어떤 공을 변화구로 부를지는 분류하는 방식이나 상황에 따라 조금씩 달라요(예: 투심을 직구 쪽으로 보기도 하고 따로 보기도 해요). 엄격한 분류표보다 “직구와 다르게 움직이는 공” 정도로 이해하면 충분해요."
+  },
+  whyMix: {
+    q: "직구만 계속 던지면 안 되나요?",
+    one: "<b>타자가 다음 공을 쉽게 예상하지 못하게 하기 위해 여러 구종을 사용해요.</b>",
+    text: "타자가 같은 속도와 궤적에 익숙해지면 공을 치기 쉬워질 수 있어요. 그래서 투수는 이런 공들을 섞어 타자의 타이밍과 예상을 흔들어요.",
+    mix: ["⚡ 빠른 공", "🐢 느린 공", "↪️ 옆으로 움직이는 공", "⤵️ 아래로 떨어지는 공"]
+  }
 };

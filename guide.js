@@ -241,7 +241,8 @@
           </div>`;
           $("[data-goto-pos]", pop).addEventListener("click", () => { pendingPos = code; goChapter(1); });
         };
-        d = makeDiamond($(".posmap", body), { view: "full", labels: "ko", onFielderClick: show });
+        // 선수 이름(1루수·중견수…)과 베이스 이름(1루·2루)이 겹쳐 헷갈리지 않게 여기서는 베이스 이름표를 끔
+        d = makeDiamond($(".posmap", body), { view: "full", labels: "ko", baseLabels: false, onFielderClick: show });
         $$(".zone-tabs button", body).forEach((b) => b.addEventListener("click", () => {
           $$(".zone-tabs button", body).forEach((x) => x.classList.toggle("active", x === b));
           const z = b.dataset.z;

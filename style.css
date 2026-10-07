@@ -248,30 +248,7 @@ section { scroll-margin-top: calc(var(--topbar-h) + 8px); }
   font-size: 11px; font-weight: 900; padding: 3px 9px; border-radius: 99px;
   transform: rotate(6deg);
 }
-
-/* ---------------- 다이아몬드 SVG ---------------- */
-.diamond { display: block; width: 100%; height: auto; }
-.diamond.mini { max-width: 110px; margin: 0 auto 6px; }
-.d-grass { fill: var(--grass); }
-.d-dirt { fill: var(--dirt); }
-.d-infield { fill: #5cc477; }
-.d-line { fill: none; stroke: var(--white); stroke-width: 3; }
-.d-path { fill: none; stroke: var(--navy); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 2 10; }
-.featured .d-path { stroke: var(--yellow); }
-.d-path.live { stroke: var(--yellow); stroke-dasharray: none; stroke-width: 5; opacity: .9; }
-.d-mound { fill: var(--dirt-deep); }
-.d-base { fill: var(--white); stroke: #c9d4e3; stroke-width: 1.5; transition: fill .3s; }
-.d-base.on { fill: var(--yellow); stroke: #e6a400; }
-.d-base.visited, .d-home.visited { fill: var(--yellow); }
-.d-home { fill: var(--white); stroke: #c9d4e3; stroke-width: 1.5; transition: fill .3s; }
-.d-label {
-  font-family: var(--font-cute); font-size: 15px; fill: var(--white);
-  text-anchor: middle; paint-order: stroke; stroke: var(--grass-deep); stroke-width: 4px;
-}
-.d-runner { transition: transform .55s cubic-bezier(.45, 0, .3, 1); }
-.d-runner circle { fill: var(--navy); stroke: var(--white); stroke-width: 3; }
-.d-runner text { fill: var(--white); font-size: 11px; font-weight: 900; text-anchor: middle; }
-
+/* 야구장 그림은 모두 diamond.js(BaseballDiamond) + guide.css 의 .bd 스타일을 사용 */
 /* ---------------- 위젯 공통 ---------------- */
 .visual { margin-top: 18px; }
 .widget { background: var(--sky-soft); border-radius: 18px; padding: 16px; }
@@ -386,13 +363,6 @@ section { scroll-margin-top: calc(var(--topbar-h) + 8px); }
 .sb-inning .up, .sb-inning .down { color: var(--sky); font-size: 16px; vertical-align: 2px; }
 .sb-main { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: center; margin-top: 12px; }
 .sb-diamond { max-width: 150px; width: 100%; margin: 0 auto; }
-.diamond.led .d-grass { fill: #14213d; }
-.diamond.led .d-dirt { fill: #1f2f55; }
-.diamond.led .d-infield { fill: #14213d; }
-.diamond.led .d-line { stroke: #3c4f7f; }
-.diamond.led .d-mound { fill: #2b3a5e; }
-.diamond.led .d-base, .diamond.led .d-home { fill: #2c3a5c; stroke: #45588a; }
-.diamond.led .d-base.on { fill: var(--yellow); stroke: var(--yellow); filter: drop-shadow(0 0 5px var(--yellow)); }
 .sb-count { display: grid; gap: 10px; }
 .sb-row { display: flex; align-items: center; gap: 8px; }
 .sb-row > span { width: 22px; font-size: 22px; color: var(--white); }

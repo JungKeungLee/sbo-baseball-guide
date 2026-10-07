@@ -26,7 +26,7 @@
     { href: "rules.html", icon: "🤔", title: "왜 저렇게 해?", sub: "도루, 견제, 태그업 등 헷갈리는 규칙", meta: "궁금한 것만 골라 보기",
       p: ratio(doneIn(chapterIds("rule")), chapterIds("rule").length) },
     { href: "player.html", icon: "👤", title: "내가 선수라면?", sub: "타자 · 투수 · 포수 기본 가이드", meta: "포지션별 약 3분",
-      p: ratio(seen, 19) }, // 타자 7탭(스윙 비교 포함) + 투수 6 + 포수 6
+      p: ratio(seen, 20) }, // 타자 7탭(스윙 비교) + 투수 7탭(구종) + 포수 6
     { href: "quiz.html", icon: "🏆", title: "야구력 테스트", sub: "퀴즈로 배운 내용 확인하기", meta: "6종류",
       p: ratio(quizDone, 6) }
   ];

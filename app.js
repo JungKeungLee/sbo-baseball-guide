@@ -41,51 +41,22 @@
     if (el) el.innerHTML = `<span class="tp-bar"><i style="width:${pct}%"></i></span><span>${n} / ${STEP_IDS.length} 다 봤어요</span>`;
   }
 
-  /* ---------------- 공통: 다이아몬드 SVG ---------------- */
-  // 0: 홈, 1: 1루, 2: 2루, 3: 3루 (포수 뒤에서 본 모습 — 1루가 오른쪽)
-  const BASES = [
-    { x: 100, y: 165, label: "홈", lx: 100, ly: 197 },
-    { x: 165, y: 100, label: "1루", lx: 165, ly: 130 },
-    { x: 100, y: 35, label: "2루", lx: 100, ly: 18 },
-    { x: 35, y: 100, label: "3루", lx: 35, ly: 130 }
-  ];
-  const pt = (i) => BASES[i].x + "," + BASES[i].y;
-
-  function diamondSVG({ runners = [], labels = true, path = 0, runner = false, cls = "" } = {}) {
-    let s = `<svg class="diamond ${cls}" viewBox="0 0 200 205" aria-hidden="true">`;
-    s += `<rect x="2" y="2" width="196" height="201" rx="26" class="d-grass"/>`;
-    s += `<polygon points="100,188 177,100 100,14 23,100" class="d-dirt"/>`;
-    s += `<polygon points="100,150 150,100 100,50 50,100" class="d-infield"/>`;
-    s += `<polygon points="${[0, 1, 2, 3].map(pt).join(" ")}" class="d-line"/>`;
-    if (path) {
-      const seq = [0, 1, 2, 3, 0].slice(0, path + 1).map(pt).join(" ");
-      s += `<polyline points="${seq}" class="d-path"/>`;
-    }
-    if (runner) s += `<polyline points="${pt(0)}" class="d-path live"/>`;
-    s += `<circle cx="100" cy="100" r="7" class="d-mound"/>`;
-    [1, 2, 3].forEach((i) => {
-      const b = BASES[i];
-      const on = runners.includes(i) ? " on" : "";
-      s += `<rect x="${b.x - 9}" y="${b.y - 9}" width="18" height="18" rx="2" transform="rotate(45 ${b.x} ${b.y})" class="d-base${on}" data-base="${i}"/>`;
-    });
-    s += `<polygon points="91,160 109,160 109,168 100,176 91,168" class="d-home" data-base="0"/>`;
-    if (labels) {
-      BASES.forEach((b) => { s += `<text x="${b.lx}" y="${b.ly}" class="d-label">${b.label}</text>`; });
-    }
-    if (runner) {
-      s += `<g class="d-runner" style="transform: translate(${BASES[0].x}px, ${BASES[0].y}px)"><circle r="10"/><text y="4">타</text></g>`;
-    }
-    s += `</svg>`;
-    return s;
+  /* ---------------- 공통: 야구장 (diamond.js 의 BaseballDiamond) ----------------
+     베이스 좌표는 BaseballDiamond.BASE_POSITIONS 한곳에서만 관리 — 다른 페이지와 똑같은 위치
+  */
+  const RUN_ORDER = ["B1", "B2", "B3", "H"];   // 홈 → 1루 → 2루 → 3루 → 홈
+  const routeArrows = (n) => ["H"].concat(RUN_ORDER).slice(0, n + 1)
+    .map((b, i, a) => (i ? { from: a[i - 1], to: b, kind: "run" } : null)).filter(Boolean);
+  function field(host, opts = {}) {
+    return new BaseballDiamond(host, Object.assign({ view: "infield", fielders: false }, opts));
   }
 
   /* ---------------- 단계별 설명 카드 ---------------- */
   function renderItem(it) {
     if (it.base) {
-      const runners = it.base < 4 ? [it.base] : [];
       return `<div class="item hit-item${it.featured ? " featured" : ""}">
         ${it.featured ? '<span class="ribbon">BEST ✨</span>' : ""}
-        ${diamondSVG({ runners, labels: false, path: it.base, cls: "mini" })}
+        <div class="hit-field" data-hit="${it.base}"></div>
         <div class="item-title">${it.title}</div>
         <div class="item-desc">→ ${it.desc}</div>
       </div>`;
@@ -117,6 +88,12 @@
         ${l.visual ? `<div class="visual" data-visual="${l.visual}"></div>` : ""}
       </article>`).join("");
 
+    $$("[data-hit]", wrap).forEach((el) => {
+      const n = +el.dataset.hit;
+      const d = field(el, { baseLabels: false });
+      d.setArrows(routeArrows(n));
+      d.setBases(n < 4 ? { on: [n] } : { hl: [0] });
+    });
     $$("[data-visual]", wrap).forEach((el) => {
       const fn = VISUALS[el.dataset.visual];
       if (fn) fn(el);
@@ -127,53 +104,33 @@
   function visualDiamond(el) {
     el.innerHTML = `
       <div class="widget run-widget">
-        <div class="run-field">${diamondSVG({ runner: true })}<div class="pop" aria-hidden="true">+1점!</div></div>
+        <div class="run-field"></div>
         <div class="run-side">
           <div class="run-score">점수 <b class="run-num">0</b></div>
-          <p class="run-msg">타자가 홈에서 기다리는 중…</p>
+          <p class="run-msg">홈 → 1루 → 2루 → 3루 → 홈 순서로 달려요</p>
           <button class="btn btn-primary btn-sm run-btn">▶ 한 바퀴 달려보기</button>
         </div>
       </div>`;
-    const svg = $("svg", el);
-    const runner = $(".d-runner", svg);
-    const line = $(".d-path.live", svg);
-    const msg = $(".run-msg", el);
-    const btn = $(".run-btn", el);
-    const num = $(".run-num", el);
-    const pop = $(".pop", el);
+    const d = field($(".run-field", el), { caption: true });
+    d.addRunner("bat", "H");
+    const btn = $(".run-btn", el), num = $(".run-num", el), msg = $(".run-msg", el);
     let score = 0;
-    const order = [1, 2, 3, 0];
-    const names = ["1루 도착!", "2루 도착!", "3루 도착!", "홈인! 🎉"];
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
+    const names = ["1루 도착!", "2루 도착!", "3루 도착!", "홈인! <b>+1점</b> 🎉"];
+    const lap = {
+      setup: { runners: { bat: "H" }, ball: null, text: "타자가 홈에서 출발!" },
+      steps: RUN_ORDER.map((b, i) => ({ text: names[i], move: { bat: b }, flash: [b], arrows: routeArrows(i + 1), score: b === "H" ? 1 : 0, dur: 750 }))
+    };
     btn.addEventListener("click", () => {
       btn.disabled = true;
-      line.setAttribute("points", pt(0));
-      $$(".d-base, .d-home", svg).forEach((b) => b.classList.remove("visited"));
-      let i = 0;
-      const stepGap = reduce ? 250 : 700;
-      const go = () => {
-        const b = order[i];
-        runner.style.transform = `translate(${BASES[b].x}px, ${BASES[b].y}px)`;
-        setTimeout(() => {
-          line.setAttribute("points", line.getAttribute("points") + " " + pt(b));
-          const baseEl = $(`[data-base="${b}"]`, svg);
-          if (baseEl) baseEl.classList.add("visited");
-          msg.textContent = names[i];
-          i++;
-          if (i < order.length) {
-            setTimeout(go, 150);
-          } else {
-            score++;
-            num.textContent = score;
-            pop.classList.remove("show"); void pop.offsetWidth; pop.classList.add("show");
-            msg.innerHTML = "홈에 들어왔으니 <b>1점!</b> 🎉";
-            btn.textContent = "▶ 한 번 더 달리기";
-            btn.disabled = false;
-          }
-        }, stepGap - 150);
-      };
-      go();
+      d.play(lap, {
+        onDone() {
+          score++;
+          num.textContent = score;
+          msg.innerHTML = "홈에 들어왔으니 <b>1점!</b> 🎉";
+          btn.textContent = "▶ 한 번 더 달리기";
+          btn.disabled = false;
+        }
+      });
     });
   }
 
@@ -265,11 +222,12 @@
           <div class="hr-result"></div>
         </div>
       </div>`;
+    const d = field($(".hr-field", el));
     const show = (i) => {
       const o = opts[i];
       const n = o.runners.length + 1;
       $$(".seg button", el).forEach((b) => b.classList.toggle("active", +b.dataset.i === i));
-      $(".hr-field", el).innerHTML = diamondSVG({ runners: o.runners, cls: "hr" });
+      d.setBases({ on: o.runners });
       const balls = "🏃".repeat(o.runners.length) + "🧢";
       const name = n === 1 ? "솔로 홈런" : n === 4 ? "만루 홈런" : `${n}점 홈런`;
       $(".hr-result", el).innerHTML = `
@@ -351,13 +309,14 @@
         <div class="sb-team"><span>${sc.home.name}</span><b>${sc.home.score}</b></div>
       </div>
       <div class="sb-main">
-        <div class="sb-diamond">${diamondSVG({ runners: sc.runners, labels: false, cls: "led" })}</div>
+        <div class="sb-diamond"></div>
         <div class="sb-count">
           <div class="sb-row"><span>B</span>${lights("ball", sc.balls, 3)}</div>
           <div class="sb-row"><span>S</span>${lights("strike", sc.strikes, 2)}</div>
           <div class="sb-row"><span>O</span>${lights("out", sc.outs, 2)}</div>
         </div>
       </div>`;
+    field($("#scoreboard .sb-diamond"), { theme: "led", baseLabels: false }).setBases({ on: sc.runners });
     $("#boardExplain").innerHTML = `
       <h4>📌 현재 상황</h4>
       <ul>${explainBoard(sc).map(([i, t]) => `<li><span>${i}</span><p>${t}</p></li>`).join("")}</ul>

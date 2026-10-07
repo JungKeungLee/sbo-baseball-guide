@@ -188,7 +188,9 @@ body.guide { --topbar-h: 60px; }
 @keyframes basepulse { 50% { stroke-width: 4; } }
 .bd-base.flash { animation: baseflash .8s ease; }
 @keyframes baseflash { 30% { fill: var(--yellow); } }
-.bd-baselabel { font-family: var(--font-cute); font-size: 11px; fill: var(--white); text-anchor: middle; paint-order: stroke; stroke: var(--grass-deep); stroke-width: 3px; }
+/* 베이스 이름표: 다이아몬드 바깥쪽 · 주자/공보다 아래 층 · 클릭 안 됨 */
+.bd-baselabels { pointer-events: none; }
+.bd-baselabel { font-family: var(--font-cute); font-size: 11px; fill: var(--white); text-anchor: middle; paint-order: stroke; stroke: var(--navy); stroke-width: 3px; stroke-linejoin: round; }
 .bd-zone { fill: transparent; transition: fill .3s; }
 .zone-in .bd-zone-in { fill: rgba(255, 200, 61, .45); stroke: var(--yellow); stroke-width: 2.5; stroke-dasharray: 6 4; }
 .zone-out .bd-zone-out { fill: rgba(108, 196, 245, .4); }
@@ -567,3 +569,22 @@ body.guide { --topbar-h: 60px; }
 
 /* ---------------- 선수 페이지 ---------------- */
 .player .p-hero .today { text-align: center; }
+
+/* ---------------- 야구장 크기 (컨테이너 폭에 맞춰 비율로 늘고 줄어듦) ---------------- */
+.hit-field { max-width: 120px; margin: 0 auto 6px; }
+.hit-field .bd-svg { border-radius: 14px; }
+.hit-item.featured .bd-arrow.run { stroke: var(--yellow); }
+.run-field { max-width: 260px; width: 100%; margin: 0 auto; }
+.hr-field .bd-svg, .run-field .bd-svg { border-radius: 16px; }
+
+/* 전광판(LED) 테마 — 같은 BaseballDiamond, 색만 바꿈 */
+.bd-led .bd-svg { border-radius: 12px; }
+.bd-led .bd-foul, .bd-led .bd-fair, .bd-led .bd-ingrass { fill: #14213d; }
+.bd-led .bd-dirt { fill: #1f2f55; }
+.bd-led .bd-track, .bd-led .bd-foulline { stroke: #26324f; }
+.bd-led .bd-basepath { stroke: #3c4f7f; }
+.bd-led .bd-mound { fill: #2b3a5e; }
+.bd-led .bd-rubber { fill: #3c4f7f; }
+.bd-led .bd-base { fill: #2c3a5c; stroke: #45588a; }
+.bd-led .bd-base.on { fill: var(--yellow); stroke: var(--yellow); filter: drop-shadow(0 0 5px var(--yellow)); }
+.view-infield .bd-fielder[data-pos="LF"], .view-infield .bd-fielder[data-pos="CF"], .view-infield .bd-fielder[data-pos="RF"] { display: none; }

@@ -932,17 +932,17 @@ const guideQuizzes = [
   { set: "spot", type: "spot", category: "position", question: "여기에 서는 선수는 누구일까요?", diagram: { highlight: "CF" }, options: ["우익수", "중견수", "투수", "포수"], answer: 1, explanation: "외야 한가운데 = <b>중견수</b>" },
   { set: "spot", type: "spot", category: "position", question: "여기에 서는 선수는 누구일까요?", diagram: { highlight: "1B" }, options: ["1루수", "2루수", "3루수", "우익수"], answer: 0, explanation: "1루 베이스 근처 = <b>1루수</b>" },
   { set: "spot", type: "spot", category: "position", question: "여기에 서는 선수는 누구일까요?", diagram: { highlight: "RF" }, options: ["좌익수", "중견수", "우익수", "2루수"], answer: 2, explanation: "타자 기준 오른쪽 외야 = <b>우익수</b>" },
-  { set: "spot", type: "spot", category: "position", question: "'핫코너'라고 불리는 이 자리는?", diagram: { highlight: "3B" }, options: ["유격수", "3루수", "좌익수", "투수"], answer: 1, explanation: "3루 근처 = <b>3루수</b>. 강한 타구가 많이 와서 핫코너!" },
+  { set: "spot", type: "spot", category: "position", question: "강한 타구가 바로 날아와서 '핫코너'라고 불리는 이 자리는?", diagram: { highlight: "3B" }, options: ["유격수", "3루수", "좌익수", "투수"], answer: 1, explanation: "3루 근처 = <b>3루수</b>. 강한 타구가 많이 와서 핫코너!" },
   { set: "spot", type: "spot", category: "position", question: "여기에 서는 선수는 누구일까요?", diagram: { highlight: "2B" }, options: ["2루수", "유격수", "1루수", "중견수"], answer: 0, explanation: "1루와 2루 사이 = <b>2루수</b>" },
 
   // ── 포지션 퀴즈
-  { set: "position", type: "choice", category: "position", question: "투수의 공을 바로 뒤에서 받는 선수는?", options: ["투수", "포수", "유격수", "중견수"], answer: 1, explanation: "홈플레이트 뒤에 앉아 공을 받는 <b>포수</b>예요." },
-  { set: "position", type: "choice", category: "position", question: "2루와 3루 사이를 주로 수비하는 선수는?", options: ["1루수", "유격수", "우익수", "포수"], answer: 1, explanation: "<b>유격수</b>는 2루와 3루 사이, 내야 수비의 중심!" },
-  { set: "position", type: "choice", category: "position", question: "외야 중앙을 주로 맡는 선수는?", options: ["중견수", "3루수", "투수", "2루수"], answer: 0, explanation: "<b>중견수</b>는 외야 수비의 중심이에요." },
-  { set: "position", type: "choice", category: "position", question: "다음 중 일반적인 내야수가 아닌 선수는?", options: ["1루수", "2루수", "유격수", "우익수"], answer: 3, explanation: "<b>우익수</b>는 외야수예요. 내야수는 1루수·2루수·3루수·유격수." },
-  { set: "position", type: "choice", category: "position", question: "'핫코너'라고 부르는 포지션은?", options: ["1루수", "3루수", "포수", "중견수"], answer: 1, explanation: "강하고 빠른 타구가 많이 오는 <b>3루</b>를 핫코너라고 해요." },
-  { set: "position", type: "choice", category: "position", question: "외야수 3명을 바르게 고른 것은?", options: ["좌익수 · 중견수 · 우익수", "1루수 · 2루수 · 3루수", "투수 · 포수 · 유격수", "유격수 · 2루수 · 중견수"], answer: 0, explanation: "외야수는 <b>좌익수 · 중견수 · 우익수</b>!" },
-  { set: "position", type: "choice", category: "position", question: "1루 주자가 도루하면 포수는 보통 무엇을 할까요?", options: ["2루로 빠르게 송구", "마운드로 올라가 투구", "외야로 달려감", "타석에 들어감"], answer: 0, explanation: "포수는 <b>2루로 빠르게 던져서</b> 도루를 막으려고 해요." },
+  { set: "position", type: "choice", category: "position", question: "투수가 타자에게 던진 공을 받는 선수는?", options: ["투수", "포수", "유격수", "중견수"], answer: 1, explanation: "홈플레이트 뒤에 앉아 공을 받는 <b>포수</b>예요." },
+  { set: "position", type: "choice", category: "position", question: "2루와 3루 사이에 서서, 그쪽으로 굴러온 땅볼을 잡아 1루로 던지는 선수는?", options: ["1루수", "유격수", "우익수", "포수"], answer: 1, explanation: "<b>유격수</b>예요. 2루와 3루 사이를 지키는 내야 수비의 중심!" },
+  { set: "position", type: "choice", category: "position", question: "멀리 한가운데로 높이 뜬 공을 달려가서 잡는 선수는?", options: ["중견수", "3루수", "투수", "2루수"], answer: 0, explanation: "<b>중견수</b>예요. 뒤쪽 넓은 잔디(외야) 한가운데를 지켜요." },
+  { set: "position", type: "choice", category: "position", question: "베이스 근처가 아니라 뒤쪽 넓은 잔디에서 멀리 날아온 공을 잡는 선수는?", options: ["1루수", "2루수", "유격수", "우익수"], answer: 3, explanation: "<b>우익수</b>예요. 뒤쪽 잔디(외야)를 지키는 외야수! 나머지 셋은 베이스 근처(내야)를 지켜요." },
+  { set: "position", type: "choice", category: "position", question: "타자 바로 앞쪽에서 아주 빠른 타구를 막아서 '핫코너'라고 불리는 자리는?", options: ["1루수", "3루수", "포수", "중견수"], answer: 1, explanation: "강하고 빠른 타구가 많이 오는 <b>3루</b>를 핫코너라고 해요." },
+  { set: "position", type: "choice", category: "position", question: "뒤쪽 넓은 잔디(외야)에서 멀리 날아온 공을 잡는 세 명은?", options: ["좌익수 · 중견수 · 우익수", "1루수 · 2루수 · 3루수", "투수 · 포수 · 유격수", "유격수 · 2루수 · 중견수"], answer: 0, explanation: "외야수는 <b>좌익수 · 중견수 · 우익수</b>!" },
+  { set: "position", type: "choice", category: "position", question: "1루 주자가 2루로 뛰기 시작했어요(도루). 공을 받은 포수는 보통 무엇을 할까요?", options: ["2루로 빠르게 송구", "마운드로 올라가 투구", "외야로 달려감", "타석에 들어감"], answer: 0, explanation: "포수는 <b>2루로 빠르게 던져서</b> 도루를 막으려고 해요." },
 
   // ── 가능 / 불가능 상황 퀴즈
   { set: "possible", type: "ox", category: "steal", question: "1루에 주자, 2루는 비어 있어요. 투수가 던지는 순간 주자가 2루로 뛰었습니다. 도루 시도가 가능한가요?", diagram: { runners: [1] }, options: ["가능", "불가능"], answer: 0, explanation: "앞 베이스(2루)가 비어 있으니 <b>도루 시도 가능</b>!" },
@@ -951,7 +951,7 @@ const guideQuizzes = [
   { set: "possible", type: "ox", category: "terminology", question: "2스트라이크에서 일반적인 스윙으로 파울이 나왔어요. 즉시 삼진인가요?", options: ["삼진이다", "삼진 아니다"], answer: 1, explanation: "일반 파울은 2스트라이크 이후엔 카운트가 안 늘어요. <b>그대로 2스트라이크</b>!" },
   { set: "possible", type: "ox", category: "terminology", question: "2스트라이크에서 번트를 했는데 파울이 됐어요. 삼진인가요?", options: ["삼진이다", "삼진 아니다"], answer: 0, explanation: "<b>번트 파울은 2스트라이크에서 삼진</b>이에요. 일반 파울과 달라요!" },
   { set: "possible", type: "ox", category: "terminology", question: "파울 지역으로 뜬 공을 수비수가 땅에 떨어지기 전에 잡았어요. 타자는 아웃인가요?", options: ["아웃이다", "아웃 아니다"], answer: 0, explanation: "파울 지역이어도 땅에 닿기 전에 잡으면 <b>아웃</b>!" },
-  { set: "possible", type: "ox", category: "tagup", question: "3루 주자가 뜬공이 잡히기 전에 너무 일찍 홈으로 출발했어요. 정상적인 태그업인가요?", diagram: { runners: [3] }, options: ["정상이다", "정상 아니다"], answer: 1, explanation: "태그업은 <b>공이 잡히는 순간부터</b> 출발해야 해요. 일찍 떠나면 수비팀 어필로 아웃될 수 있어요." },
+  { set: "possible", type: "ox", category: "tagup", question: "3루 주자가 뜬공이 잡히기 전에 너무 일찍 홈으로 출발했어요. 규칙대로 한 플레이(태그업)일까요?", diagram: { runners: [3] }, options: ["규칙대로 했다", "규칙에 어긋난다"], answer: 1, explanation: "태그업은 <b>공이 잡히는 순간부터</b> 출발해야 해요. 일찍 떠나면 수비팀 어필로 아웃될 수 있어요." },
   { set: "possible", type: "ox", category: "situation", question: "만루에서 타자가 볼넷을 얻었어요. 점수가 날 수 있나요?", diagram: { runners: [1, 2, 3] }, options: ["가능", "불가능"], answer: 0, explanation: "3루 주자가 밀려서 홈으로! <b>밀어내기 볼넷 1점</b>." },
   { set: "possible", type: "ox", category: "forceout", question: "2루 주자가 3루 도루를 시도해요. 3루수가 공을 가진 채 3루 베이스만 밟았어요. 주자는 무조건 아웃인가요?", diagram: { runners: [2] }, options: ["무조건 아웃", "아웃 아님"], answer: 1, explanation: "포스 상황이 아니라서 <b>주자를 직접 태그</b>해야 아웃이에요." },
   { set: "possible", type: "choice", category: "forceout", question: "1아웃, 주자 1루에서 타자가 땅볼을 쳤어요. 수비가 2루와 1루에서 연속으로 아웃을 잡았어요. 무슨 플레이일까요?", diagram: { runners: [1] }, options: ["병살", "협살", "희생번트", "도루"], answer: 0, explanation: "한 번에 아웃 2개 = <b>병살</b>!" },
@@ -961,7 +961,7 @@ const guideQuizzes = [
   { set: "real", type: "situation", category: "forceout", question: "주자 1루에서 타자가 땅볼을 쳤어요. 수비가 2루 → 1루 순서로 두 명을 모두 아웃시켰어요.", diagram: { runners: [1] }, options: ["병살", "삼자범퇴", "희생플라이", "끝내기"], answer: 0, explanation: "한 플레이로 두 명 = <b>병살</b>" },
   { set: "real", type: "situation", category: "situation", question: "9회 말 동점 상황에서 홈팀이 한 점을 냈어요. 이걸 뭐라고 할까요?", options: ["끝내기", "연장전 시작", "공수교대", "노히트 노런"], answer: 0, explanation: "홈팀이 마지막 공격에서 앞서는 순간 바로 경기 끝 = <b>끝내기</b>" },
   { set: "real", type: "situation", category: "record", question: "투수가 상대팀에게 안타를 하나도 허용하지 않고(점수도 없이) 경기를 끝냈어요.", options: ["노히트 노런", "완투", "사이클링 히트", "멀티히트"], answer: 0, explanation: "안타 0개 = <b>노히트 노런</b>. 볼넷 등으로 주자가 나간 적은 있을 수 있어요." },
-  { set: "real", type: "situation", category: "tagup", question: "1아웃 3루에서 외야 깊은 뜬공이 잡혔고, 3루 주자가 태그업해서 홈인했어요. 타자의 기록은?", diagram: { runners: [3] }, options: ["희생플라이", "희생번트", "도루", "보크"], answer: 0, explanation: "아웃은 됐지만 점수를 만든 뜬공 = <b>희생플라이</b>" },
+  { set: "real", type: "situation", category: "tagup", question: "1아웃 3루에서 외야 깊은 뜬공이 잡혔고, 3루 주자가 태그업해서 홈인했어요. 이 플레이를 뭐라고 부를까요?", diagram: { runners: [3] }, options: ["희생플라이", "희생번트", "도루", "보크"], answer: 0, explanation: "아웃은 됐지만 점수를 만든 뜬공 = <b>희생플라이</b>" },
   { set: "real", type: "situation", category: "terminology", question: "캐스터가 \"2사 1, 3루\"라고 했어요. 무슨 뜻일까요?", diagram: { runners: [1, 3] }, options: ["2아웃, 1루와 3루에 주자", "2점 차, 1루와 3루에 주자", "1아웃, 2루와 3루에 주자", "2아웃, 주자 3명"], answer: 0, explanation: "<b>사 = 아웃</b>. 2사 = 2아웃!" },
   { set: "real", type: "situation", category: "record", question: "투수가 안타는 하나도 안 맞았지만 볼넷 1개를 줬어요(점수 0). 퍼펙트게임일까요?", options: ["퍼펙트게임이다", "퍼펙트게임은 아니다"], answer: 1, explanation: "퍼펙트게임은 <b>아무도 출루하면 안 돼요</b>. 이건 노히트 노런!" },
   { set: "real", type: "situation", category: "situation", question: "만루에서 투수 공이 타자 몸에 맞았어요(몸에 맞는 공 인정). 어떻게 될까요?", diagram: { runners: [1, 2, 3] }, options: ["1점이 난다", "점수 없음", "타자 아웃", "공수교대"], answer: 0, explanation: "타자가 1루로 가면서 모두 밀려 3루 주자 홈인 → <b>1점</b>" }

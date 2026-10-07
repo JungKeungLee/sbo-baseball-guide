@@ -27,7 +27,7 @@
       view: cfg.view || "infield",
       fielders: cfg.fielders !== false,
       labels: cfg.labels || "code",
-      baseLabels: !!cfg.baseLabels,
+      baseLabels: cfg.baseLabels !== false, // 1루·2루·3루·홈 이름표는 기본으로 표시
       caption: !!cfg.caption,
       onFielderClick: cfg.onFielderClick || null
     });
